@@ -12,6 +12,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
+    -webkit-user-drag: none;
 }
 
 
@@ -24,6 +31,8 @@ body {
 
 html {
     background: #000;
+
+    -webkit-touch-callout: none;
 }
 
 
@@ -39,11 +48,13 @@ body {
     font-family:
         "Courier New",
         monospace;
+
+    -webkit-touch-callout: none;
 }
 
 
 /* ========================================
-   NORMAL PC CURSOR TAMAMEN KAPAT
+   NORMAL PC CURSOR TAMAMEN KAPALI
 ======================================== */
 
 html,
@@ -54,6 +65,34 @@ button,
 img,
 svg {
     cursor: none !important;
+}
+
+
+/* ========================================
+   TEXT SELECTION TAMAMEN KAPALI
+======================================== */
+
+::selection {
+    background: transparent;
+    color: inherit;
+}
+
+
+::-moz-selection {
+    background: transparent;
+    color: inherit;
+}
+
+
+/* ========================================
+   DRAG KAPALI
+======================================== */
+
+img,
+svg,
+a {
+    -webkit-user-drag: none !important;
+    user-select: none !important;
 }
 
 
@@ -113,15 +152,10 @@ svg {
     width: 24px;
     height: 24px;
 
-    pointer-events: none;
-
     z-index: 99999999;
 
-    /*
-        İlk katman template cursor.
-        İkinci katman cursor resmi
-        bulunamazsa ufak beyaz fallback.
-    */
+    pointer-events: none;
+
     background-image:
         url("assets/custom_cursor.png"),
         radial-gradient(
@@ -229,20 +263,19 @@ svg {
 }
 
 
-/* LINK HOVER */
-
 body.cursor-hovering .custom-cursor {
     width: 28px;
     height: 28px;
 
     filter:
         drop-shadow(0 0 3px white)
-        drop-shadow(0 0 8px rgba(255,255,255,1))
-        drop-shadow(0 0 16px rgba(255,255,255,.65));
+        drop-shadow(0 0 8px white)
+        drop-shadow(
+            0 0 16px
+            rgba(255,255,255,.65)
+        );
 }
 
-
-/* CLICK */
 
 body.cursor-clicking .custom-cursor {
     width: 20px;
@@ -326,6 +359,9 @@ body.cursor-clicking .custom-cursor {
     backdrop-filter:
         blur(10px);
 
+    -webkit-backdrop-filter:
+        blur(10px);
+
     transition:
         opacity .65s ease,
         visibility .65s ease;
@@ -360,7 +396,29 @@ body.cursor-clicking .custom-cursor {
     text-shadow:
         0 0 8px white,
         0 0 18px rgba(255,255,255,.75),
-        0 0 35px rgba(255,255,255,.3);
+        0 0 35px rgba(255,255,255,.30);
+
+    animation:
+        startPulse 1.6s ease-in-out infinite;
+}
+
+
+@keyframes startPulse {
+
+    0%,
+    100% {
+        opacity: .72;
+
+        transform:
+            scale(1);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+            scale(1.035);
+    }
 }
 
 
@@ -387,9 +445,6 @@ body.cursor-clicking .custom-cursor {
 
 /* ========================================
    PROFILE WRAPPER
-
-   Bu element ortalamayı yönetir.
-   JS transform uygulamaz.
 ======================================== */
 
 .profile-wrapper {
@@ -406,8 +461,6 @@ body.cursor-clicking .custom-cursor {
 
 /* ========================================
    PROFILE CARD
-
-   Mouse tilt SADECE bunda.
 ======================================== */
 
 #profile-block {
@@ -424,7 +477,8 @@ body.cursor-clicking .custom-cursor {
     border:
         1px solid rgba(255,255,255,.43);
 
-    border-radius: 18px;
+    border-radius:
+        18px;
 
     background:
         linear-gradient(
@@ -436,14 +490,21 @@ body.cursor-clicking .custom-cursor {
     backdrop-filter:
         blur(13px);
 
+    -webkit-backdrop-filter:
+        blur(13px);
+
     box-shadow:
         0 22px 75px rgba(0,0,0,.75),
         inset 0 0 35px rgba(255,255,255,.035),
         0 0 22px rgba(255,255,255,.04);
 
     transform:
+        translate3d(0,0,0)
         rotateX(0deg)
         rotateY(0deg);
+
+    transform-origin:
+        center center;
 
     transform-style:
         preserve-3d;
@@ -515,6 +576,9 @@ body.cursor-clicking .custom-cursor {
 
     transform:
         translateZ(35px);
+
+    transform-style:
+        preserve-3d;
 }
 
 
@@ -557,7 +621,8 @@ body.cursor-clicking .custom-cursor {
     border:
         2px solid rgba(255,255,255,.92);
 
-    background: #050505;
+    background:
+        #050505;
 
     box-shadow:
         0 0 9px white,
@@ -737,9 +802,11 @@ body.cursor-clicking .custom-cursor {
             42px
         );
 
-    font-weight: 800;
+    font-weight:
+        800;
 
-    letter-spacing: 2px;
+    letter-spacing:
+        2px;
 
     word-break:
         break-word;
@@ -752,8 +819,21 @@ body.cursor-clicking .custom-cursor {
 
 
 /* ========================================
-   ROBLOX WEB BOT
+   ROLES
 ======================================== */
+
+.role-badges {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 14px;
+}
+
 
 .role-badge {
     display: inline-flex;
@@ -762,10 +842,8 @@ body.cursor-clicking .custom-cursor {
 
     justify-content: center;
 
-    margin-top: 14px;
-
     padding:
-        7px 14px;
+        7px 13px;
 
     border:
         1px solid rgba(255,255,255,.32);
@@ -777,31 +855,62 @@ body.cursor-clicking .custom-cursor {
         rgba(255,255,255,.07);
 
     color:
-        rgba(255,255,255,.9);
+        rgba(255,255,255,.92);
 
-    font-size: 12px;
+    font-size:
+        11px;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
-    letter-spacing: 1px;
+    letter-spacing:
+        .8px;
+
+    white-space:
+        nowrap;
 
     box-shadow:
         0 0 12px rgba(255,255,255,.06),
         inset 0 0 10px rgba(255,255,255,.04);
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
 }
 
 
-#profile-bio {
-    margin-top: 26px;
+.role-badge:hover {
+    transform:
+        translateY(-2px);
 
-    max-width: 535px;
+    background:
+        rgba(255,255,255,.12);
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,.12);
+}
+
+
+/* ========================================
+   BIO
+======================================== */
+
+#profile-bio {
+    margin-top:
+        24px;
+
+    max-width:
+        535px;
 
     color:
         rgba(255,255,255,.82);
 
-    font-size: 17px;
+    font-size:
+        17px;
 
-    line-height: 1.6;
+    line-height:
+        1.6;
 }
 
 
@@ -834,7 +943,7 @@ body.cursor-clicking .custom-cursor {
 
 
 /* ========================================
-   SOCIALS
+   SOCIAL LINKS
 ======================================== */
 
 .social-links {
@@ -845,16 +954,22 @@ body.cursor-clicking .custom-cursor {
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
 
-    gap: 10px;
+    gap:
+        10px;
 
-    padding: 11px;
+    padding:
+        11px;
 
     border:
         1px solid rgba(255,255,255,.14);
 
-    border-radius: 16px;
+    border-radius:
+        16px;
 
     background:
         rgba(0,0,0,.43);
@@ -865,23 +980,32 @@ body.cursor-clicking .custom-cursor {
 
 
 .social-link {
-    min-height: 70px;
+    min-height:
+        70px;
 
-    display: flex;
+    display:
+        flex;
 
-    flex-direction: column;
+    flex-direction:
+        column;
 
-    align-items: center;
+    align-items:
+        center;
 
-    justify-content: center;
+    justify-content:
+        center;
 
-    gap: 7px;
+    gap:
+        7px;
 
-    border-radius: 11px;
+    border-radius:
+        11px;
 
-    color: white;
+    color:
+        white;
 
-    text-decoration: none;
+    text-decoration:
+        none;
 
     transition:
         transform .22s ease,
@@ -891,22 +1015,29 @@ body.cursor-clicking .custom-cursor {
 
 
 .social-link svg {
-    width: 28px;
-    height: 28px;
+    width:
+        28px;
 
-    fill: white;
+    height:
+        28px;
+
+    fill:
+        white;
 
     filter:
         drop-shadow(
-            0 0 6px rgba(255,255,255,.65)
+            0 0 6px
+            rgba(255,255,255,.65)
         );
 }
 
 
 .social-link span {
-    font-size: 12px;
+    font-size:
+        12px;
 
-    opacity: .84;
+    opacity:
+        .84;
 }
 
 
@@ -928,11 +1059,14 @@ body.cursor-clicking .custom-cursor {
 ======================================== */
 
 .profile-footer {
-    position: relative;
+    position:
+        relative;
 
-    z-index: 5;
+    z-index:
+        5;
 
-    margin-top: 14px;
+    margin-top:
+        14px;
 
     transform:
         translateZ(20px);
@@ -940,11 +1074,14 @@ body.cursor-clicking .custom-cursor {
 
 
 .visitor-counter {
-    display: inline-flex;
+    display:
+        inline-flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 8px;
+    gap:
+        8px;
 
     padding:
         9px 14px;
@@ -961,24 +1098,32 @@ body.cursor-clicking .custom-cursor {
     color:
         rgba(255,255,255,.9);
 
-    font-size: 13px;
+    font-size:
+        13px;
 }
 
 
 .visitor-counter svg {
-    width: 18px;
-    height: 18px;
+    width:
+        18px;
 
-    fill: none;
+    height:
+        18px;
 
-    stroke: white;
+    fill:
+        none;
 
-    stroke-width: 1.7;
+    stroke:
+        white;
+
+    stroke-width:
+        1.7;
 }
 
 
 .views-label {
-    opacity: .48;
+    opacity:
+        .48;
 }
 
 
@@ -1028,12 +1173,14 @@ body.cursor-clicking .custom-cursor {
 @media (max-width: 650px) {
 
     body {
-        overflow-y: auto;
+        overflow-y:
+            auto;
     }
 
 
     .page {
-        min-height: 100vh;
+        min-height:
+            100vh;
 
         padding:
             18px 12px;
@@ -1041,64 +1188,95 @@ body.cursor-clicking .custom-cursor {
 
 
     #profile-block {
-        padding: 20px;
+        padding:
+            20px;
 
-        min-height: auto;
+        min-height:
+            auto;
     }
 
 
     .profile-header {
-        flex-direction: column;
+        flex-direction:
+            column;
 
-        text-align: center;
+        text-align:
+            center;
 
-        gap: 10px;
+        gap:
+            10px;
     }
 
 
     .profile-container {
-        width: 150px;
-        height: 150px;
+        width:
+            150px;
 
-        flex-basis: 150px;
+        height:
+            150px;
+
+        flex-basis:
+            150px;
     }
 
 
     .profile-picture {
-        width: 120px;
-        height: 120px;
+        width:
+            120px;
+
+        height:
+            120px;
     }
 
 
     .profile-orbit {
-        width: 140px;
-        height: 140px;
+        width:
+            140px;
+
+        height:
+            140px;
     }
 
 
     .orbit-particles {
-        width: 180px;
-        height: 180px;
+        width:
+            180px;
+
+        height:
+            180px;
     }
 
 
     #profile-name {
-        font-size: 27px;
+        font-size:
+            27px;
+    }
+
+
+    .role-badges {
+        justify-content:
+            center;
     }
 
 
     #profile-bio {
-        margin-top: 18px;
+        margin-top:
+            18px;
 
-        font-size: 14px;
+        font-size:
+            14px;
 
-        text-align: center;
+        text-align:
+            center;
     }
 
 
     .social-links {
         grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
     }
 }
 
@@ -1116,12 +1294,14 @@ body.cursor-clicking .custom-cursor {
     button,
     img,
     svg {
-        cursor: auto !important;
+        cursor:
+            auto !important;
     }
 
 
     .custom-cursor,
     .cursor-spark {
-        display: none !important;
+        display:
+            none !important;
     }
 }
