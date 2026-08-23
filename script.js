@@ -1,155 +1,251 @@
-let hasUserInteracted = false;
+(() => {
 
-/*
-  BODY:
-  <body class="home-theme" onload="initMedia()">
-
-  MUSIC:
-  <audio id="background-music" loop>
-      <source src="music.mp3" type="audio/mpeg">
-  </audio>
-*/
-
-function initMedia() {
-    const music = document.getElementById("background-music");
-
-    if (!music) {
-        console.warn("background-music bulunamadı.");
-        return;
-    }
-
-    music.volume = 0.3;
-    music.loop = true;
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    /* =========================
-       ELEMENTLER
-    ========================= */
-
-    const startScreen =
-        document.getElementById("start-screen");
-
-    const startText =
-        document.getElementById("start-text");
-
-    const profileBlock =
-        document.getElementById("profile-block");
-
-    const profileName =
-        document.getElementById("profile-name");
-
-    const profileBio =
-        document.getElementById("profile-bio");
-
-    const profilePicture =
-        document.querySelector(".profile-picture");
-
-    const profileContainer =
-        document.querySelector(".profile-container");
-
-    const visitorCount =
-        document.getElementById("visitor-count");
-
-    const backgroundMusic =
-        document.getElementById("background-music");
-
-    const customCursor =
-        document.querySelector(".custom-cursor");
-
-    const glitchOverlay =
-        document.querySelector(".glitch-overlay");
+    "use strict";
 
 
     /* =========================
-       AYARLAR
+       SETTINGS
     ========================= */
 
-    const NAME =
+    const PROFILE_NAME =
         "TurkdogruDev/T.Dev";
 
-    const BIO =
+
+    const PROFILE_BIO =
         "I dont know what to put but my favorite color is white.";
+
 
     const START_MESSAGE =
         "Click To Enter!";
 
-    /*
-       Sayaç ilk defa:
-       10,258
-
-       Sonraki açılış:
-       10,259
-       10,260...
-    */
-
-    const COUNTER_KEY =
-        "turkdogrudev-view-counter-v6";
 
     const START_COUNTER =
         10258;
 
 
+    /*
+        Eski 921.xxx localStorage değerinden
+        etkilenmemesi için yeni key.
+    */
+
+    const COUNTER_KEY =
+        "turkdogrudev_views_v10";
+
+
     /* =========================
-       TOUCH / PC
+       ELEMENTS
     ========================= */
 
+    const startScreen =
+        document.getElementById(
+            "start-screen"
+        );
+
+
+    const startText =
+        document.getElementById(
+            "start-text"
+        );
+
+
+    const profileShell =
+        document.getElementById(
+            "profile-shell"
+        );
+
+
+    const profileCard =
+        document.getElementById(
+            "profile-card"
+        );
+
+
+    const profileName =
+        document.getElementById(
+            "profile-name"
+        );
+
+
+    const profileBio =
+        document.getElementById(
+            "profile-bio"
+        );
+
+
+    const profilePicture =
+        document.getElementById(
+            "profile-picture"
+        );
+
+
+    const visitorCount =
+        document.getElementById(
+            "visitor-count"
+        );
+
+
+    const backgroundMusic =
+        document.getElementById(
+            "background-music"
+        );
+
+
+    const customCursor =
+        document.getElementById(
+            "custom-cursor"
+        );
+
+
     const isTouchDevice =
-        window.matchMedia("(pointer: coarse)").matches;
+        window.matchMedia(
+            "(pointer: coarse)"
+        ).matches;
+
+
+    let entered =
+        false;
 
 
     /* =========================
        CUSTOM CURSOR
-
-       Sistem cursorunu CSS gizliyor.
-       Burada yalnızca sitenin
-       kendi cursor'u hareket ediyor.
     ========================= */
 
-    function initializeCursor() {
+    function initializeCustomCursor() {
 
-        if (!customCursor) {
+        if (
+            !customCursor ||
+            isTouchDevice
+        ) {
             return;
         }
 
-        if (isTouchDevice) {
 
-            document.body.classList.add(
-                "touch-device"
-            );
+        /*
+            Gerçek mouse koordinatı.
+        */
 
-            customCursor.style.display =
-                "none";
+        let mouseX =
+            window.innerWidth / 2;
 
-            return;
-        }
 
+        let mouseY =
+            window.innerHeight / 2;
+
+
+        /*
+            Custom cursor koordinatı.
+        */
+
+        let cursorX =
+            mouseX;
+
+
+        let cursorY =
+            mouseY;
+
+
+        let lastSparkTime =
+            0;
+
+
+        /*
+            Mouse hareketi.
+        */
 
         document.addEventListener(
             "mousemove",
             (event) => {
 
-                customCursor.style.display =
-                    "block";
+                mouseX =
+                    event.clientX;
 
-                customCursor.style.left =
-                    event.clientX + "px";
 
-                customCursor.style.top =
-                    event.clientY + "px";
+                mouseY =
+                    event.clientY;
+
+
+                customCursor.style.opacity =
+                    "1";
+
+
+                /*
+                    Çok fazla particle üretmemek
+                    için 24ms throttle.
+                */
+
+                const now =
+                    performance.now();
+
+
+                if (
+                    now -
+                    lastSparkTime >
+                    24
+                ) {
+
+                    createCursorSpark(
+                        mouseX,
+                        mouseY
+                    );
+
+
+                    lastSparkTime =
+                        now;
+                }
 
             }
         );
 
 
+        /*
+            Smooth custom cursor.
+        */
+
+        function animateCursor() {
+
+            cursorX +=
+                (
+                    mouseX -
+                    cursorX
+                ) * 0.42;
+
+
+            cursorY +=
+                (
+                    mouseY -
+                    cursorY
+                ) * 0.42;
+
+
+            customCursor.style.left =
+                cursorX + "px";
+
+
+            customCursor.style.top =
+                cursorY + "px";
+
+
+            requestAnimationFrame(
+                animateCursor
+            );
+
+        }
+
+
+        animateCursor();
+
+
+        /*
+            Mouse tıklama.
+        */
+
         document.addEventListener(
             "mousedown",
             () => {
 
-                customCursor.style.transform =
-                    "translate(-50%, -50%) scale(0.8)";
+                document.body.classList.add(
+                    "cursor-click"
+                );
 
             }
         );
@@ -159,30 +255,84 @@ document.addEventListener("DOMContentLoaded", () => {
             "mouseup",
             () => {
 
-                customCursor.style.transform =
-                    "translate(-50%, -50%) scale(1)";
+                document.body.classList.remove(
+                    "cursor-click"
+                );
+
+            }
+        );
+
+
+        /*
+            Link / buton / profil fotoğrafı
+            üstüne gelince büyüsün.
+        */
+
+        document.addEventListener(
+            "mouseover",
+            (event) => {
+
+                const interactive =
+                    event.target.closest(
+                        "a, button, .profile-picture"
+                    );
+
+
+                if (interactive) {
+
+                    document.body.classList.add(
+                        "cursor-hover"
+                    );
+
+                }
 
             }
         );
 
 
         document.addEventListener(
+            "mouseout",
+            (event) => {
+
+                const interactive =
+                    event.target.closest(
+                        "a, button, .profile-picture"
+                    );
+
+
+                if (interactive) {
+
+                    document.body.classList.remove(
+                        "cursor-hover"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /*
+            Tarayıcı dışına çıkınca gizle.
+        */
+
+        document.documentElement.addEventListener(
             "mouseleave",
             () => {
 
-                customCursor.style.display =
-                    "none";
+                customCursor.style.opacity =
+                    "0";
 
             }
         );
 
 
-        document.addEventListener(
+        document.documentElement.addEventListener(
             "mouseenter",
             () => {
 
-                customCursor.style.display =
-                    "block";
+                customCursor.style.opacity =
+                    "1";
 
             }
         );
@@ -191,71 +341,171 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       GITHUB PROFİL FOTOĞRAFI
+       CURSOR SPARK
     ========================= */
 
-    function initializeProfilePicture() {
+    function createCursorSpark(
+        x,
+        y
+    ) {
 
-        if (!profilePicture) {
-            return;
-        }
+        const spark =
+            document.createElement(
+                "div"
+            );
 
-        profilePicture.src =
-            "https://github.com/TurkdogruDev.png?size=300";
 
-        profilePicture.onerror =
-            function () {
+        spark.className =
+            "cursor-spark";
 
-                /*
-                  GitHub resmi yüklenemezse
-                  kırık resim ikonu göstermesin.
-                */
 
-                this.style.visibility =
-                    "hidden";
+        /*
+            Mouse etrafında random
+            saçılma yönü.
+        */
 
-            };
+        const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const distance =
+            8 +
+            Math.random() *
+            18;
+
+
+        const sparkX =
+            Math.cos(angle) *
+            distance;
+
+
+        const sparkY =
+            Math.sin(angle) *
+            distance;
+
+
+        spark.style.left =
+            x + "px";
+
+
+        spark.style.top =
+            y + "px";
+
+
+        spark.style.setProperty(
+            "--spark-x",
+            sparkX + "px"
+        );
+
+
+        spark.style.setProperty(
+            "--spark-y",
+            sparkY + "px"
+        );
+
+
+        /*
+            Parçacıkların büyüklüğü
+            biraz farklı olsun.
+        */
+
+        const size =
+            2 +
+            Math.random() *
+            4;
+
+
+        spark.style.width =
+            size + "px";
+
+
+        spark.style.height =
+            size + "px";
+
+
+        document.body.appendChild(
+            spark
+        );
+
+
+        setTimeout(
+            () => {
+
+                spark.remove();
+
+            },
+            600
+        );
 
     }
 
 
     /* =========================
-       SAYAC
+       COUNTER
     ========================= */
 
-    function initializeVisitorCounter() {
+    function initializeCounter() {
 
         if (!visitorCount) {
             return;
         }
 
+
         let count =
-            parseInt(
-                localStorage.getItem(
-                    COUNTER_KEY
-                ),
-                10
+            START_COUNTER;
+
+
+        /*
+            localStorage bazı gizli
+            modlarda hata verebilir.
+        */
+
+        try {
+
+            const stored =
+                Number.parseInt(
+                    localStorage.getItem(
+                        COUNTER_KEY
+                    ),
+                    10
+                );
+
+
+            /*
+                İlk açılış:
+                10,258
+
+                Sonraki:
+                10,259
+                10,260...
+            */
+
+            if (
+                Number.isFinite(stored) &&
+                stored >= START_COUNTER
+            ) {
+
+                count =
+                    stored + 1;
+
+            }
+
+
+            localStorage.setItem(
+                COUNTER_KEY,
+                String(count)
             );
 
+        } catch (error) {
 
-        if (
-            Number.isNaN(count) ||
-            count < START_COUNTER - 1
-        ) {
-
-            count =
-                START_COUNTER - 1;
+            console.warn(
+                "Sayaç localStorage kullanamadı.",
+                error
+            );
 
         }
-
-
-        count++;
-
-
-        localStorage.setItem(
-            COUNTER_KEY,
-            String(count)
-        );
 
 
         visitorCount.textContent =
@@ -267,8 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       CLICK TO ENTER
-       TYPEWRITER
+       START TYPEWRITER
     ========================= */
 
     function initializeStartText() {
@@ -277,9 +526,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        let index = 0;
-        let text = "";
-        let cursorVisible = true;
+
+        startText.textContent =
+            "";
+
+
+        let index =
+            0;
 
 
         function write() {
@@ -289,17 +542,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 START_MESSAGE.length
             ) {
 
-                text =
-                    START_MESSAGE.slice(
-                        0,
-                        index + 1
-                    );
-
                 index++;
 
 
                 startText.textContent =
-                    text + "|";
+                    START_MESSAGE.slice(
+                        0,
+                        index
+                    ) + "|";
 
 
                 setTimeout(
@@ -310,7 +560,10 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
 
                 startText.textContent =
-                    START_MESSAGE + "|";
+                    START_MESSAGE;
+
+
+                blinkStartCursor();
 
             }
 
@@ -319,17 +572,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
         write();
 
+    }
+
+
+    function blinkStartCursor() {
+
+        if (!startText) {
+            return;
+        }
+
+
+        let visible =
+            true;
+
 
         setInterval(
             () => {
 
-                cursorVisible =
-                    !cursorVisible;
+                /*
+                    Giriş yapıldıysa artık
+                    bunun çalışmasının önemi yok.
+                */
+
+                if (entered) {
+                    return;
+                }
+
+
+                visible =
+                    !visible;
+
 
                 startText.textContent =
-                    text +
+                    START_MESSAGE +
                     (
-                        cursorVisible
+                        visible
                             ? "|"
                             : " "
                     );
@@ -342,57 +619,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       İSİM TYPEWRITER
+       NORMAL TYPEWRITER
     ========================= */
 
-    let nameAnimationStarted =
-        false;
+    function typeText(
+        element,
+        text,
+        speed
+    ) {
 
-
-    function typeWriterName() {
-
-        if (
-            !profileName ||
-            nameAnimationStarted
-        ) {
+        if (!element) {
             return;
         }
 
-        nameAnimationStarted =
-            true;
 
-
-        let index = 0;
-
-
-        profileName.textContent =
+        element.textContent =
             "";
 
 
-        function writeName() {
+        let index =
+            0;
 
-            if (index < NAME.length) {
+
+        function write() {
+
+            if (
+                index <
+                text.length
+            ) {
 
                 index++;
 
 
-                profileName.textContent =
-                    NAME.slice(
+                element.textContent =
+                    text.slice(
                         0,
                         index
                     ) + "|";
 
 
                 /*
-                  Hafif glitch.
+                    Name üzerinde
+                    küçük glitch ihtimali.
                 */
 
                 if (
+                    element ===
+                        profileName &&
                     Math.random() <
-                    0.08
+                        0.07
                 ) {
 
-                    profileName.classList.add(
+                    element.classList.add(
                         "glitch"
                     );
 
@@ -400,101 +678,39 @@ document.addEventListener("DOMContentLoaded", () => {
                     setTimeout(
                         () => {
 
-                            profileName.classList.remove(
+                            element.classList.remove(
                                 "glitch"
                             );
 
                         },
-                        150
+                        170
                     );
 
                 }
 
 
                 setTimeout(
-                    writeName,
-                    100
+                    write,
+                    speed
                 );
 
             } else {
 
-                profileName.textContent =
-                    NAME;
+                element.textContent =
+                    text;
 
             }
 
         }
 
 
-        writeName();
+        write();
 
     }
 
 
     /* =========================
-       BIO TYPEWRITER
-    ========================= */
-
-    let bioAnimationStarted =
-        false;
-
-
-    function typeWriterBio() {
-
-        if (
-            !profileBio ||
-            bioAnimationStarted
-        ) {
-            return;
-        }
-
-        bioAnimationStarted =
-            true;
-
-
-        let index = 0;
-
-
-        profileBio.textContent =
-            "";
-
-
-        function writeBio() {
-
-            if (index < BIO.length) {
-
-                index++;
-
-
-                profileBio.textContent =
-                    BIO.slice(
-                        0,
-                        index
-                    ) + "|";
-
-
-                setTimeout(
-                    writeBio,
-                    45
-                );
-
-            } else {
-
-                profileBio.textContent =
-                    BIO;
-
-            }
-
-        }
-
-
-        writeBio();
-
-    }
-
-
-    /* =========================
-       MUSIC.MP3
+       MUSIC
     ========================= */
 
     function playMusic() {
@@ -502,7 +718,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!backgroundMusic) {
 
             console.warn(
-                "background-music elementi yok."
+                "background-music bulunamadı."
             );
 
             return;
@@ -511,26 +727,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
         backgroundMusic.volume =
-            0.3;
+            0.35;
+
 
         backgroundMusic.loop =
             true;
+
 
         backgroundMusic.muted =
             false;
 
 
-        const result =
+        /*
+            currentTime = 0 diyerek
+            her girişte baştan başlat.
+        */
+
+        try {
+
+            backgroundMusic.currentTime =
+                0;
+
+        } catch (error) {
+            /* ignore */
+        }
+
+
+        const playPromise =
             backgroundMusic.play();
 
 
         if (
-            result &&
-            typeof result.catch ===
+            playPromise &&
+            typeof playPromise.catch ===
                 "function"
         ) {
 
-            result.catch(
+            playPromise.catch(
                 (error) => {
 
                     console.warn(
@@ -547,113 +780,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       PROFİLİ GÖSTER
+       ENTER SITE
     ========================= */
 
-    function showProfile() {
+    function enterSite() {
 
-        if (!profileBlock) {
+        if (entered) {
             return;
         }
+
+
+        entered =
+            true;
 
 
         /*
-          ÖNEMLİ:
-
-          Original CSS:
-          top: 50%;
-          left: 50%;
-          transform:
-          translate(-50%, -50%);
-
-          Bu translate korunmazsa
-          kart sağa / aşağı kayıyor.
+            Start screen kapat.
         */
-
-
-        profileBlock.style.transition =
-            "opacity 0.8s ease, transform 0.8s ease";
-
-
-        profileBlock.style.opacity =
-            "0";
-
-
-        profileBlock.style.transform =
-            `
-            translate(-50%, -45%)
-            perspective(1000px)
-            rotateX(0deg)
-            rotateY(0deg)
-            `;
-
-
-        profileBlock.classList.remove(
-            "hidden"
-        );
-
-
-        requestAnimationFrame(
-            () => {
-
-                requestAnimationFrame(
-                    () => {
-
-                        profileBlock.style.opacity =
-                            "1";
-
-
-                        profileBlock.style.transform =
-                            `
-                            translate(-50%, -50%)
-                            perspective(1000px)
-                            rotateX(0deg)
-                            rotateY(0deg)
-                            `;
-
-                    }
-                );
-
-            }
-        );
-
-
-        if (profileContainer) {
-
-            profileContainer.classList.add(
-                "orbit"
-            );
-
-        }
-
-    }
-
-
-    /* =========================
-       SITEYE GİR
-    ========================= */
-
-    function enterSite(event) {
-
-        if (
-            event &&
-            event.type ===
-                "touchstart"
-        ) {
-
-            event.preventDefault();
-
-        }
-
-
-        if (hasUserInteracted) {
-            return;
-        }
-
-
-        hasUserInteracted =
-            true;
-
 
         if (startScreen) {
 
@@ -664,85 +807,125 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
+        /*
+            Profil göster.
+        */
+
+        if (profileShell) {
+
+            /*
+                Önce hidden classı kaldır.
+            */
+
+            requestAnimationFrame(
+                () => {
+
+                    profileShell.classList.remove(
+                        "profile-hidden"
+                    );
+
+                }
+            );
+
+        }
+
+
+        /*
+            User interaction olduğu için
+            müzik burada çalışabilir.
+        */
+
         playMusic();
 
-        showProfile();
 
-        typeWriterName();
+        /*
+            Name + bio.
+        */
+
+        typeText(
+            profileName,
+            PROFILE_NAME,
+            70
+        );
 
 
         setTimeout(
             () => {
 
-                typeWriterBio();
+                typeText(
+                    profileBio,
+                    PROFILE_BIO,
+                    28
+                );
 
             },
-            500
+            350
         );
 
     }
 
 
     /* =========================
-       PROFİL KARTI 3D HAREKET
-
-       Bu bölüm profil kutusunun
-       mouse'a göre düzgün dönmesini
-       sağlar.
+       3D PROFILE CARD TILT
     ========================= */
 
-    function initializeTilt() {
+    function initializeCardTilt() {
 
         if (
-            !profileBlock ||
+            !profileCard ||
             isTouchDevice
         ) {
             return;
         }
 
 
-        let targetRotateX = 0;
-        let targetRotateY = 0;
+        /*
+            Target rotation.
+        */
 
-        let currentRotateX = 0;
-        let currentRotateY = 0;
+        let targetRotateX =
+            0;
 
-        let mouseInside =
-            false;
+
+        let targetRotateY =
+            0;
 
 
         /*
-          Çok yüksek yaparsan
-          kart gereğinden fazla döner.
+            Current smooth rotation.
         */
 
+        let currentRotateX =
+            0;
+
+
+        let currentRotateY =
+            0;
+
+
         const MAX_ROTATION =
-            8;
+            7;
 
 
-        profileBlock.addEventListener(
+        /*
+            Mouse profil kutusunun
+            üzerinde hareket ettiğinde.
+        */
+
+        profileCard.addEventListener(
             "mousemove",
             (event) => {
 
-                if (!hasUserInteracted) {
-                    return;
-                }
-
-
-                mouseInside =
-                    true;
-
-
                 const rect =
-                    profileBlock.getBoundingClientRect();
+                    profileCard.getBoundingClientRect();
 
 
-                const mouseX =
+                const x =
                     event.clientX -
                     rect.left;
 
 
-                const mouseY =
+                const y =
                     event.clientY -
                     rect.top;
 
@@ -755,51 +938,44 @@ document.addEventListener("DOMContentLoaded", () => {
                     rect.height / 2;
 
 
-                const percentX =
+                const percentageX =
                     (
-                        mouseX -
+                        x -
                         centerX
                     ) /
                     centerX;
 
 
-                const percentY =
+                const percentageY =
                     (
-                        mouseY -
+                        y -
                         centerY
                     ) /
                     centerY;
 
 
-                /*
-                  Mouse sağa:
-                  kart sağ tarafa döner.
-
-                  Mouse yukarı:
-                  kart yukarı kalkar.
-                */
-
                 targetRotateY =
-                    percentX *
+                    percentageX *
                     MAX_ROTATION;
 
 
                 targetRotateX =
-                    -percentY *
+                    -percentageY *
                     MAX_ROTATION;
 
             }
         );
 
 
-        profileBlock.addEventListener(
+        /*
+            Mouse karttan çıkınca
+            normal konuma dön.
+        */
+
+        profileCard.addEventListener(
             "mouseleave",
             () => {
 
-                mouseInside =
-                    false;
-
-
                 targetRotateX =
                     0;
 
@@ -811,43 +987,35 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
 
-        function animateTilt() {
+        /*
+            Smooth animation.
+        */
 
-            /*
-              LERP sayesinde
-              takılmadan yumuşak döner.
-            */
+        function animateTilt() {
 
             currentRotateX +=
                 (
                     targetRotateX -
                     currentRotateX
-                ) *
-                0.10;
+                ) * .09;
 
 
             currentRotateY +=
                 (
                     targetRotateY -
                     currentRotateY
-                ) *
-                0.10;
+                ) * .09;
 
 
-            if (
-                hasUserInteracted &&
-                profileBlock
-            ) {
-
-                profileBlock.style.transform =
-                    `
-                    translate(-50%, -50%)
-                    perspective(1000px)
-                    rotateX(${currentRotateX}deg)
-                    rotateY(${currentRotateY}deg)
-                    `;
-
-            }
+            profileCard.style.transform =
+                `
+                    rotateX(
+                        ${currentRotateX}deg
+                    )
+                    rotateY(
+                        ${currentRotateY}deg
+                    )
+                `;
 
 
             requestAnimationFrame(
@@ -863,119 +1031,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       PROFİL FOTOĞRAFI EFEKTİ
+       AVATAR EFFECT
     ========================= */
 
-    function initializeProfileEffects() {
+    function initializeAvatarEffect() {
 
-        if (
-            !profilePicture ||
-            !profileContainer
-        ) {
+        if (!profilePicture) {
             return;
         }
 
 
-        /*
-          Mouse avatar üstüne gelince
-          glitch.
-        */
-
         profilePicture.addEventListener(
-            "mouseenter",
+            "click",
             () => {
 
-                if (!glitchOverlay) {
-                    return;
-                }
+                /*
+                    Avatar click animation.
+                */
 
+                profilePicture.animate(
+                    [
+                        {
+                            transform:
+                                "scale(1)"
+                        },
 
-                glitchOverlay.style.opacity =
-                    "1";
+                        {
+                            transform:
+                                "scale(.93)"
+                        },
 
+                        {
+                            transform:
+                                "scale(1.07)"
+                        },
 
-                setTimeout(
-                    () => {
+                        {
+                            transform:
+                                "scale(1)"
+                        }
+                    ],
+                    {
+                        duration:
+                            480,
 
-                        glitchOverlay.style.opacity =
-                            "0";
-
-                    },
-                    350
+                        easing:
+                            "ease-out"
+                    }
                 );
 
             }
         );
 
-
-        /*
-          Avatar'a basınca
-          beyaz halka hızla döner.
-        */
-
-        function fastOrbit() {
-
-            profileContainer.classList.remove(
-                "fast-orbit"
-            );
+    }
 
 
-            profileContainer.classList.remove(
-                "orbit"
-            );
+    /* =========================
+       IMAGE FALLBACK
+    ========================= */
 
+    function initializeProfileImage() {
 
-            /*
-              Animasyonu resetlemek için.
-            */
-
-            void profileContainer.offsetWidth;
-
-
-            profileContainer.classList.add(
-                "fast-orbit"
-            );
-
-
-            setTimeout(
-                () => {
-
-                    profileContainer.classList.remove(
-                        "fast-orbit"
-                    );
-
-
-                    void profileContainer.offsetWidth;
-
-
-                    profileContainer.classList.add(
-                        "orbit"
-                    );
-
-                },
-                500
-            );
-
+        if (!profilePicture) {
+            return;
         }
 
 
-        profilePicture.addEventListener(
-            "click",
-            fastOrbit
-        );
+        /*
+            GitHub avatar.
+        */
+
+        profilePicture.src =
+            "https://github.com/TurkdogruDev.png?size=320";
 
 
         profilePicture.addEventListener(
-            "touchstart",
-            (event) => {
+            "error",
+            () => {
 
-                event.preventDefault();
+                console.warn(
+                    "GitHub avatar yüklenemedi."
+                );
 
-                fastOrbit();
-
-            },
-            {
-                passive: false
             }
         );
 
@@ -983,22 +1120,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       EVENTLER
+       START EVENTS
     ========================= */
 
     if (startScreen) {
 
+        /*
+            CLICK
+        */
+
         startScreen.addEventListener(
             "click",
-            enterSite
+            enterSite,
+            {
+                once: true
+            }
         );
 
+
+        /*
+            TOUCH
+        */
 
         startScreen.addEventListener(
             "touchstart",
             enterSite,
             {
-                passive: false
+                once: true,
+                passive: true
             }
         );
 
@@ -1006,19 +1155,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =========================
-       BAŞLAT
+       INITIALIZE
     ========================= */
 
-    initializeCursor();
+    initializeCustomCursor();
 
-    initializeProfilePicture();
-
-    initializeVisitorCounter();
+    initializeCounter();
 
     initializeStartText();
 
-    initializeTilt();
+    initializeCardTilt();
 
-    initializeProfileEffects();
+    initializeAvatarEffect();
 
-});
+    initializeProfileImage();
+
+})();
