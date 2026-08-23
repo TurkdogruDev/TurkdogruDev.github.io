@@ -24,9 +24,9 @@
 
 
     /*
-        Bunu artık değiştirme.
-        Böylece sayaç her kod güncellemesinde
-        sıfırlanmaz.
+        Sabit tut.
+        Böylece her kod değişiminde
+        localStorage sayacı sıfırlanmaz.
     */
 
     const COUNTER_KEY =
@@ -106,7 +106,7 @@
 
 
     /* ========================================
-       SAFE LOCAL STORAGE
+       STORAGE
     ======================================== */
 
     function storageGet(key) {
@@ -151,7 +151,6 @@
 
 
     /* ========================================
-       PROTECTION
        RIGHT CLICK / SELECT / DRAG
     ======================================== */
 
@@ -159,7 +158,7 @@
 
 
         /*
-            SAĞ TIK KAPALI
+            SAĞ TIK
         */
 
         document.addEventListener(
@@ -173,7 +172,7 @@
 
 
         /*
-            MOUSE İLE YAZI SEÇİMİ KAPALI
+            YAZI SEÇME
         */
 
         document.addEventListener(
@@ -187,8 +186,7 @@
 
 
         /*
-            RESİM / LINK / SVG
-            SÜRÜKLEME KAPALI
+            RESİM / LINK / SVG DRAG
         */
 
         document.addEventListener(
@@ -202,7 +200,7 @@
 
 
         /*
-            MOUSE BIRAKILDIĞINDA
+            MOUSE BIRAKINCA
             SELECTION TEMİZLE
         */
 
@@ -226,6 +224,7 @@
 
         /*
             CTRL + A
+            CMD + A
         */
 
         document.addEventListener(
@@ -251,7 +250,6 @@
             }
         );
 
-
     }
 
 
@@ -260,7 +258,6 @@
     ======================================== */
 
     function initializeCursor() {
-
 
         if (
             !customCursor ||
@@ -292,14 +289,9 @@
             0;
 
 
-        /* ====================================
-           MOUSE MOVEMENT
-        ==================================== */
-
         document.addEventListener(
             "mousemove",
             (event) => {
-
 
                 mouseX =
                     event.clientX;
@@ -334,17 +326,11 @@
 
                 }
 
-
             }
         );
 
 
-        /* ====================================
-           SMOOTH CURSOR LOOP
-        ==================================== */
-
         function animateCursor() {
-
 
             cursorX +=
                 (
@@ -376,16 +362,13 @@
                 animateCursor
             );
 
-
         }
 
 
         animateCursor();
 
 
-        /* ====================================
-           CLICK
-        ==================================== */
+        /* CLICK */
 
         document.addEventListener(
             "mousedown",
@@ -411,14 +394,11 @@
         );
 
 
-        /* ====================================
-           HOVER
-        ==================================== */
+        /* HOVER */
 
         document.addEventListener(
             "mouseover",
             (event) => {
-
 
                 if (
                     !(event.target instanceof Element)
@@ -443,7 +423,6 @@
 
                 }
 
-
             }
         );
 
@@ -451,7 +430,6 @@
         document.addEventListener(
             "mouseout",
             (event) => {
-
 
                 if (
                     !(event.target instanceof Element)
@@ -476,14 +454,9 @@
 
                 }
 
-
             }
         );
 
-
-        /* ====================================
-           WINDOW LEAVE
-        ==================================== */
 
         document.documentElement.addEventListener(
             "mouseleave",
@@ -506,7 +479,6 @@
             }
         );
 
-
     }
 
 
@@ -518,7 +490,6 @@
         x,
         y
     ) {
-
 
         if (isTouchDevice) {
 
@@ -597,7 +568,6 @@
             500
         );
 
-
     }
 
 
@@ -606,7 +576,6 @@
     ======================================== */
 
     function initializeCounter() {
-
 
         if (!visitorCount) {
 
@@ -656,7 +625,6 @@
                 "en-US"
             );
 
-
     }
 
 
@@ -665,7 +633,6 @@
     ======================================== */
 
     function initializeStartText() {
-
 
         if (!startText) {
 
@@ -692,12 +659,10 @@
 
         function write() {
 
-
             if (
                 index <
                 START_MESSAGE.length
             ) {
-
 
                 index++;
 
@@ -719,9 +684,7 @@
                     85
                 );
 
-
             }
-
 
         }
 
@@ -731,7 +694,6 @@
 
         setInterval(
             () => {
-
 
                 if (entered) {
 
@@ -752,11 +714,9 @@
                             : " "
                     );
 
-
             },
             500
         );
-
 
     }
 
@@ -771,7 +731,6 @@
         speed,
         glitch = false
     ) {
-
 
         if (!element) {
 
@@ -790,12 +749,10 @@
 
         function write() {
 
-
             if (
                 index <
                 text.length
             ) {
-
 
                 index++;
 
@@ -811,9 +768,8 @@
                 if (
                     glitch &&
                     Math.random() <
-                        0.07
+                    0.07
                 ) {
-
 
                     element.classList.add(
                         "glitch"
@@ -831,7 +787,6 @@
                         150
                     );
 
-
                 }
 
 
@@ -840,32 +795,26 @@
                     speed
                 );
 
-
             } else {
-
 
                 element.textContent =
                     text;
 
-
             }
-
 
         }
 
 
         write();
 
-
     }
 
 
     /* ========================================
-       MUSIC INITIALIZE
+       MUSIC
     ======================================== */
 
     function initializeMusic() {
-
 
         if (!music) {
 
@@ -887,46 +836,13 @@
 
 
         /*
-            ÖNEMLİ:
-            Music position kaydedilmiyor.
+            Burada play() yapmıyoruz.
 
-            Her refresh sonrası
-            0:00'dan başlayacak.
+            Telefon tarayıcılarının
+            kullanıcı etkileşimi kuralına
+            uygun olması için müzik sadece
+            Click To Enter tıklamasında başlar.
         */
-
-        try {
-
-            music.currentTime =
-                0;
-
-        } catch (error) {
-
-            console.warn(
-                "Music reset error:",
-                error
-            );
-
-        }
-
-
-        /*
-            Dosyayı indirmeye hazırlasın
-            ama otomatik oynatmasın.
-        */
-
-        try {
-
-            music.load();
-
-        } catch (error) {
-
-            console.warn(
-                "Music load error:",
-                error
-            );
-
-        }
-
 
     }
 
@@ -937,7 +853,6 @@
 
     function playMusic() {
 
-
         if (!music) {
 
             return;
@@ -958,16 +873,20 @@
 
 
         /*
-            HER CLICK TO ENTER
-            0:00'DAN BAŞLAR.
+            Her refresh sonrası müzik
+            tekrar en baştan başlasın.
         */
 
         try {
 
-            music.pause();
+            if (
+                music.readyState >= 1
+            ) {
 
-            music.currentTime =
-                0;
+                music.currentTime =
+                    0;
+
+            }
 
         } catch (error) {
 
@@ -979,18 +898,23 @@
         }
 
 
-        const playPromise =
+        /*
+            Mobil tarayıcılar için
+            play() gerçek click eventinin
+            içinde çağrılıyor.
+        */
+
+        const promise =
             music.play();
 
 
         if (
-            playPromise &&
-            typeof playPromise.catch ===
+            promise &&
+            typeof promise.catch ===
                 "function"
         ) {
 
-
-            playPromise.catch(
+            promise.catch(
                 (error) => {
 
                     console.warn(
@@ -1001,9 +925,7 @@
                 }
             );
 
-
         }
-
 
     }
 
@@ -1014,12 +936,6 @@
 
     function enterSite() {
 
-
-        /*
-            Aynı girişte iki kere
-            çalışmasın.
-        */
-
         if (entered) {
 
             return;
@@ -1027,35 +943,37 @@
         }
 
 
+        /*
+            ÖNCE MUSIC PLAY.
+
+            Böylece mobile browser için
+            doğrudan kullanıcı click eventinin
+            içinden çağrılmış olur.
+        */
+
+        playMusic();
+
+
         entered =
             true;
 
 
-        /* ====================================
-           START SCREEN KAPAT
-        ==================================== */
+        /*
+            START SCREEN GİZLE
+        */
 
         if (startScreen) {
-
 
             startScreen.classList.add(
                 "hidden"
             );
 
-
         }
 
 
-        /* ====================================
-           MUSIC START
-        ==================================== */
-
-        playMusic();
-
-
-        /* ====================================
-           PROFILE NAME
-        ==================================== */
+        /*
+            PROFILE NAME
+        */
 
         typeText(
             profileName,
@@ -1065,13 +983,12 @@
         );
 
 
-        /* ====================================
-           BIO
-        ==================================== */
+        /*
+            BIO
+        */
 
         setTimeout(
             () => {
-
 
                 typeText(
                     profileBio,
@@ -1080,11 +997,9 @@
                     false
                 );
 
-
             },
             350
         );
-
 
     }
 
@@ -1094,7 +1009,6 @@
     ======================================== */
 
     function initializeProfileMovement() {
-
 
         if (
             !profileBlock ||
@@ -1146,19 +1060,9 @@
             5;
 
 
-        /* ====================================
-           MOUSE MOVEMENT
-        ==================================== */
-
         document.addEventListener(
             "mousemove",
             (event) => {
-
-
-                /*
-                    Click To Enter
-                    yapılmadan profil hareket etmez.
-                */
 
                 if (!entered) {
 
@@ -1212,19 +1116,13 @@
                     percentY *
                     MAX_MOVE;
 
-
             }
         );
 
 
-        /* ====================================
-           MOUSE WINDOW'DAN ÇIKARSA
-        ==================================== */
-
         document.documentElement.addEventListener(
             "mouseleave",
             () => {
-
 
                 targetRotateX =
                     0;
@@ -1241,17 +1139,11 @@
                 targetMoveY =
                     0;
 
-
             }
         );
 
 
-        /* ====================================
-           ANIMATION LOOP
-        ==================================== */
-
         function animateProfile() {
-
 
             currentRotateX +=
                 (
@@ -1307,12 +1199,10 @@
                 animateProfile
             );
 
-
         }
 
 
         animateProfile();
-
 
     }
 
@@ -1322,7 +1212,6 @@
     ======================================== */
 
     function initializeAvatarEffect() {
-
 
         if (!profilePicture) {
 
@@ -1335,10 +1224,8 @@
             "click",
             () => {
 
-
                 profilePicture.animate(
                     [
-
                         {
                             transform:
                                 "scale(1)"
@@ -1358,65 +1245,38 @@
                             transform:
                                 "scale(1)"
                         }
-
                     ],
                     {
-
                         duration:
                             450,
 
                         easing:
                             "ease-out"
-
                     }
                 );
 
-
             }
         );
-
 
     }
 
 
     /* ========================================
-       CLICK TO ENTER EVENTS
+       CLICK TO ENTER
+
+       touchstart YOK
+       preventDefault YOK
     ======================================== */
 
     if (startScreen) {
 
-
-        /*
-            PC
-        */
-
         startScreen.addEventListener(
             "click",
-            enterSite
-        );
-
-
-        /*
-            MOBILE
-        */
-
-        startScreen.addEventListener(
-            "touchstart",
-            (event) => {
-
-
-                event.preventDefault();
-
-                enterSite();
-
-
-            },
+            enterSite,
             {
-                passive:
-                    false
+                once: true
             }
         );
-
 
     }
 
@@ -1427,23 +1287,16 @@
 
     initializeProtection();
 
-
     initializeCursor();
-
 
     initializeCounter();
 
-
     initializeStartText();
-
 
     initializeMusic();
 
-
     initializeProfileMovement();
 
-
     initializeAvatarEffect();
-
 
 })();
