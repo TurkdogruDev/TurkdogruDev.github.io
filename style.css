@@ -11,11 +11,13 @@
 * {
     margin: 0;
     padding: 0;
+
     box-sizing: border-box;
 
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+
     user-select: none;
 
     -webkit-user-drag: none;
@@ -43,7 +45,7 @@ body {
 
     background: #000;
 
-    color: #fff;
+    color: white;
 
     font-family:
         "Courier New",
@@ -54,7 +56,7 @@ body {
 
 
 /* ========================================
-   NORMAL PC CURSOR TAMAMEN KAPALI
+   NORMAL CURSOR KAPALI
 ======================================== */
 
 html,
@@ -69,30 +71,20 @@ svg {
 
 
 /* ========================================
-   TEXT SELECTION TAMAMEN KAPALI
+   TEXT SELECTION KAPALI
 ======================================== */
 
 ::selection {
     background: transparent;
+
     color: inherit;
 }
 
 
 ::-moz-selection {
     background: transparent;
+
     color: inherit;
-}
-
-
-/* ========================================
-   DRAG KAPALI
-======================================== */
-
-img,
-svg,
-a {
-    -webkit-user-drag: none !important;
-    user-select: none !important;
 }
 
 
@@ -186,10 +178,10 @@ a {
             0 0 2px white
         )
         drop-shadow(
-            0 0 5px rgba(255,255,255,.95)
+            0 0 5px rgba(255, 255, 255, 0.95)
         )
         drop-shadow(
-            0 0 11px rgba(255,255,255,.55)
+            0 0 11px rgba(255, 255, 255, 0.55)
         );
 
     will-change:
@@ -197,14 +189,16 @@ a {
         top;
 
     transition:
-        width .12s ease,
-        height .12s ease,
-        opacity .12s ease,
-        filter .12s ease;
+        width 0.12s ease,
+        height 0.12s ease,
+        opacity 0.12s ease,
+        filter 0.12s ease;
 }
 
 
-/* CURSOR GLOW */
+/* ========================================
+   CURSOR GLOW
+======================================== */
 
 .custom-cursor::before {
     content: "";
@@ -229,8 +223,8 @@ a {
     background:
         radial-gradient(
             circle,
-            rgba(255,255,255,.27),
-            rgba(255,255,255,.08) 42%,
+            rgba(255, 255, 255, 0.27),
+            rgba(255, 255, 255, 0.08) 42%,
             transparent 72%
         );
 
@@ -246,11 +240,11 @@ a {
 
     0%,
     100% {
-        opacity: .45;
+        opacity: 0.45;
 
         transform:
             translate(-50%, -50%)
-            scale(.85);
+            scale(0.85);
     }
 
     50% {
@@ -271,8 +265,7 @@ body.cursor-hovering .custom-cursor {
         drop-shadow(0 0 3px white)
         drop-shadow(0 0 8px white)
         drop-shadow(
-            0 0 16px
-            rgba(255,255,255,.65)
+            0 0 16px rgba(255, 255, 255, 0.65)
         );
 }
 
@@ -303,20 +296,20 @@ body.cursor-clicking .custom-cursor {
 
     box-shadow:
         0 0 4px white,
-        0 0 9px rgba(255,255,255,.85);
+        0 0 9px rgba(255, 255, 255, 0.85);
 
     transform:
         translate(-50%, -50%);
 
     animation:
-        sparkFade .45s ease-out forwards;
+        sparkFade 0.45s ease-out forwards;
 }
 
 
 @keyframes sparkFade {
 
     0% {
-        opacity: .85;
+        opacity: 0.85;
 
         transform:
             translate(-50%, -50%)
@@ -331,7 +324,7 @@ body.cursor-clicking .custom-cursor {
                 calc(-50% + var(--x)),
                 calc(-50% + var(--y))
             )
-            scale(.1);
+            scale(0.1);
     }
 }
 
@@ -354,7 +347,7 @@ body.cursor-clicking .custom-cursor {
     justify-content: center;
 
     background:
-        rgba(0, 0, 0, .82);
+        rgba(0, 0, 0, 0.82);
 
     backdrop-filter:
         blur(10px);
@@ -363,8 +356,8 @@ body.cursor-clicking .custom-cursor {
         blur(10px);
 
     transition:
-        opacity .65s ease,
-        visibility .65s ease;
+        opacity 0.65s ease,
+        visibility 0.65s ease;
 }
 
 
@@ -378,7 +371,7 @@ body.cursor-clicking .custom-cursor {
 
 
 #start-text {
-    color: #fff;
+    color: white;
 
     font-size:
         clamp(
@@ -395,8 +388,8 @@ body.cursor-clicking .custom-cursor {
 
     text-shadow:
         0 0 8px white,
-        0 0 18px rgba(255,255,255,.75),
-        0 0 35px rgba(255,255,255,.30);
+        0 0 18px rgba(255, 255, 255, 0.75),
+        0 0 35px rgba(255, 255, 255, 0.30);
 
     animation:
         startPulse 1.6s ease-in-out infinite;
@@ -407,7 +400,7 @@ body.cursor-clicking .custom-cursor {
 
     0%,
     100% {
-        opacity: .72;
+        opacity: 0.72;
 
         transform:
             scale(1);
@@ -460,7 +453,7 @@ body.cursor-clicking .custom-cursor {
 
 
 /* ========================================
-   PROFILE CARD
+   PROFILE BLOCK
 ======================================== */
 
 #profile-block {
@@ -475,7 +468,7 @@ body.cursor-clicking .custom-cursor {
     overflow: hidden;
 
     border:
-        1px solid rgba(255,255,255,.43);
+        1px solid rgba(255, 255, 255, 0.43);
 
     border-radius:
         18px;
@@ -483,8 +476,8 @@ body.cursor-clicking .custom-cursor {
     background:
         linear-gradient(
             145deg,
-            rgba(0,0,0,.83),
-            rgba(12,12,12,.67)
+            rgba(0, 0, 0, 0.83),
+            rgba(12, 12, 12, 0.67)
         );
 
     backdrop-filter:
@@ -494,12 +487,12 @@ body.cursor-clicking .custom-cursor {
         blur(13px);
 
     box-shadow:
-        0 22px 75px rgba(0,0,0,.75),
-        inset 0 0 35px rgba(255,255,255,.035),
-        0 0 22px rgba(255,255,255,.04);
+        0 22px 75px rgba(0, 0, 0, 0.75),
+        inset 0 0 35px rgba(255, 255, 255, 0.035),
+        0 0 22px rgba(255, 255, 255, 0.04);
 
     transform:
-        translate3d(0,0,0)
+        translate3d(0, 0, 0)
         rotateX(0deg)
         rotateY(0deg);
 
@@ -533,7 +526,7 @@ body.cursor-clicking .custom-cursor {
         linear-gradient(
             90deg,
             transparent,
-            rgba(255,255,255,.065),
+            rgba(255, 255, 255, 0.065),
             transparent
         );
 
@@ -619,19 +612,19 @@ body.cursor-clicking .custom-cursor {
     object-fit: cover;
 
     border:
-        2px solid rgba(255,255,255,.92);
+        2px solid rgba(255, 255, 255, 0.92);
 
     background:
         #050505;
 
     box-shadow:
         0 0 9px white,
-        0 0 24px rgba(255,255,255,.62),
-        0 0 45px rgba(255,255,255,.20);
+        0 0 24px rgba(255, 255, 255, 0.62),
+        0 0 45px rgba(255, 255, 255, 0.20);
 
     transition:
-        transform .25s ease,
-        box-shadow .25s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 
@@ -642,13 +635,13 @@ body.cursor-clicking .custom-cursor {
 
     box-shadow:
         0 0 12px white,
-        0 0 32px rgba(255,255,255,.78),
-        0 0 55px rgba(255,255,255,.27);
+        0 0 32px rgba(255, 255, 255, 0.78),
+        0 0 55px rgba(255, 255, 255, 0.27);
 }
 
 
 /* ========================================
-   WHITE AVATAR ORBIT
+   PROFILE ORBIT
 ======================================== */
 
 .profile-orbit {
@@ -666,7 +659,7 @@ body.cursor-clicking .custom-cursor {
             transparent 0deg,
             transparent 34deg,
 
-            rgba(255,255,255,.25) 58deg,
+            rgba(255, 255, 255, 0.25) 58deg,
 
             white 84deg,
 
@@ -676,7 +669,7 @@ body.cursor-clicking .custom-cursor {
 
             transparent 253deg,
 
-            rgba(255,255,255,.40) 286deg,
+            rgba(255, 255, 255, 0.40) 286deg,
 
             white 316deg,
 
@@ -684,7 +677,9 @@ body.cursor-clicking .custom-cursor {
         );
 
     filter:
-        drop-shadow(0 0 7px white);
+        drop-shadow(
+            0 0 7px white
+        );
 
     animation:
         orbitSpin 3s linear infinite;
@@ -701,7 +696,7 @@ body.cursor-clicking .custom-cursor {
     border-radius: 50%;
 
     background:
-        rgba(0,0,0,.96);
+        rgba(0, 0, 0, 0.96);
 }
 
 
@@ -744,18 +739,20 @@ body.cursor-clicking .custom-cursor {
 
         radial-gradient(
             circle at 8% 58%,
-            rgba(255,255,255,.7) 0 2px,
+            rgba(255, 255, 255, 0.7) 0 2px,
             transparent 3px
         ),
 
         radial-gradient(
             circle at 14% 66%,
-            rgba(255,255,255,.45) 0 2px,
+            rgba(255, 255, 255, 0.45) 0 2px,
             transparent 3px
         );
 
     filter:
-        drop-shadow(0 0 5px white);
+        drop-shadow(
+            0 0 5px white
+        );
 
     animation:
         particlesSpin 4.7s linear infinite;
@@ -788,7 +785,7 @@ body.cursor-clicking .custom-cursor {
 
 
 #profile-name {
-    color: #fff;
+    color: white;
 
     font-family:
         Arial,
@@ -813,13 +810,13 @@ body.cursor-clicking .custom-cursor {
 
     text-shadow:
         0 0 7px white,
-        0 0 17px rgba(255,255,255,.72),
-        0 0 34px rgba(255,255,255,.28);
+        0 0 17px rgba(255, 255, 255, 0.72),
+        0 0 34px rgba(255, 255, 255, 0.28);
 }
 
 
 /* ========================================
-   ROLES
+   ROLE CARDS
 ======================================== */
 
 .role-badges {
@@ -829,9 +826,10 @@ body.cursor-clicking .custom-cursor {
 
     flex-wrap: wrap;
 
-    gap: 7px;
+    gap: 8px;
 
-    margin-top: 14px;
+    margin-top:
+        14px;
 }
 
 
@@ -842,20 +840,23 @@ body.cursor-clicking .custom-cursor {
 
     justify-content: center;
 
+    min-height:
+        29px;
+
     padding:
         7px 13px;
 
     border:
-        1px solid rgba(255,255,255,.32);
+        1px solid rgba(255, 255, 255, 0.32);
 
     border-radius:
         999px;
 
     background:
-        rgba(255,255,255,.07);
+        rgba(255, 255, 255, 0.07);
 
     color:
-        rgba(255,255,255,.92);
+        rgba(255, 255, 255, 0.92);
 
     font-size:
         11px;
@@ -864,19 +865,20 @@ body.cursor-clicking .custom-cursor {
         bold;
 
     letter-spacing:
-        .8px;
+        0.7px;
 
     white-space:
         nowrap;
 
     box-shadow:
-        0 0 12px rgba(255,255,255,.06),
-        inset 0 0 10px rgba(255,255,255,.04);
+        0 0 12px rgba(255, 255, 255, 0.06),
+        inset 0 0 10px rgba(255, 255, 255, 0.04);
 
     transition:
-        transform .2s ease,
-        background .2s ease,
-        box-shadow .2s ease;
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 
@@ -884,11 +886,14 @@ body.cursor-clicking .custom-cursor {
     transform:
         translateY(-2px);
 
+    border-color:
+        rgba(255, 255, 255, 0.65);
+
     background:
-        rgba(255,255,255,.12);
+        rgba(255, 255, 255, 0.12);
 
     box-shadow:
-        0 0 12px rgba(255,255,255,.12);
+        0 0 13px rgba(255, 255, 255, 0.15);
 }
 
 
@@ -904,7 +909,7 @@ body.cursor-clicking .custom-cursor {
         535px;
 
     color:
-        rgba(255,255,255,.82);
+        rgba(255, 255, 255, 0.82);
 
     font-size:
         17px;
@@ -933,7 +938,7 @@ body.cursor-clicking .custom-cursor {
         linear-gradient(
             90deg,
             transparent,
-            rgba(255,255,255,.55),
+            rgba(255, 255, 255, 0.55),
             transparent
         );
 
@@ -966,13 +971,13 @@ body.cursor-clicking .custom-cursor {
         11px;
 
     border:
-        1px solid rgba(255,255,255,.14);
+        1px solid rgba(255, 255, 255, 0.14);
 
     border-radius:
         16px;
 
     background:
-        rgba(0,0,0,.43);
+        rgba(0, 0, 0, 0.43);
 
     transform:
         translateZ(29px);
@@ -1008,9 +1013,9 @@ body.cursor-clicking .custom-cursor {
         none;
 
     transition:
-        transform .22s ease,
-        background .22s ease,
-        box-shadow .22s ease;
+        transform 0.22s ease,
+        background 0.22s ease,
+        box-shadow 0.22s ease;
 }
 
 
@@ -1027,7 +1032,7 @@ body.cursor-clicking .custom-cursor {
     filter:
         drop-shadow(
             0 0 6px
-            rgba(255,255,255,.65)
+            rgba(255, 255, 255, 0.65)
         );
 }
 
@@ -1037,7 +1042,7 @@ body.cursor-clicking .custom-cursor {
         12px;
 
     opacity:
-        .84;
+        0.84;
 }
 
 
@@ -1047,10 +1052,10 @@ body.cursor-clicking .custom-cursor {
         scale(1.035);
 
     background:
-        rgba(255,255,255,.08);
+        rgba(255, 255, 255, 0.08);
 
     box-shadow:
-        0 6px 22px rgba(255,255,255,.07);
+        0 6px 22px rgba(255, 255, 255, 0.07);
 }
 
 
@@ -1087,16 +1092,16 @@ body.cursor-clicking .custom-cursor {
         9px 14px;
 
     border:
-        1px solid rgba(255,255,255,.14);
+        1px solid rgba(255, 255, 255, 0.14);
 
     border-radius:
         999px;
 
     background:
-        rgba(255,255,255,.08);
+        rgba(255, 255, 255, 0.08);
 
     color:
-        rgba(255,255,255,.9);
+        rgba(255, 255, 255, 0.9);
 
     font-size:
         13px;
@@ -1123,7 +1128,7 @@ body.cursor-clicking .custom-cursor {
 
 .views-label {
     opacity:
-        .48;
+        0.48;
 }
 
 
@@ -1133,7 +1138,7 @@ body.cursor-clicking .custom-cursor {
 
 .glitch {
     animation:
-        glitchText .16s linear;
+        glitchText 0.16s linear;
 }
 
 
@@ -1282,7 +1287,7 @@ body.cursor-clicking .custom-cursor {
 
 
 /* ========================================
-   TOUCH DEVICE
+   TOUCH DEVICES
 ======================================== */
 
 @media (pointer: coarse) {
