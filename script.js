@@ -23,18 +23,16 @@
         10258;
 
 
-    /*
-        Eski 921.xxx sayaçtan tamamen ayrı.
-    */
     const COUNTER_KEY =
-        "turkdogrudev_profile_views_v30";
+        "turkdogrudev_profile_views_v50";
 
 
-    /*
-        Siteye daha önce girildi mi?
-    */
-    const ENTER_KEY =
-        "turkdogrudev_entered_v30";
+    const MUSIC_TIME_KEY =
+        "turkdogrudev_music_position_v50";
+
+
+    const MUSIC_VOLUME =
+        0.35;
 
 
     /* ========================================
@@ -106,7 +104,7 @@
 
 
     /* ========================================
-       SAFE LOCAL STORAGE
+       SAFE STORAGE
     ======================================== */
 
     function storageGet(key) {
@@ -141,11 +139,112 @@
         } catch (error) {
 
             console.warn(
-                "localStorage unavailable:",
+                "localStorage error:",
                 error
             );
 
         }
+
+    }
+
+
+    /* ========================================
+       RIGHT CLICK / DRAG / SELECT BLOCK
+    ======================================== */
+
+    function initializeProtection() {
+
+        /*
+            SAĞ TIK MENÜSÜ KAPALI
+        */
+
+        document.addEventListener(
+            "contextmenu",
+            (event) => {
+
+                event.preventDefault();
+
+            }
+        );
+
+
+        /*
+            MOUSE İLE MAVİ TEXT SEÇİMİ KAPALI
+        */
+
+        document.addEventListener(
+            "selectstart",
+            (event) => {
+
+                event.preventDefault();
+
+            }
+        );
+
+
+        /*
+            IMAGE / LINK / SVG DRAG KAPALI
+        */
+
+        document.addEventListener(
+            "dragstart",
+            (event) => {
+
+                event.preventDefault();
+
+            }
+        );
+
+
+        /*
+            MOUSE BIRAKILDIĞINDA
+            VARSA SELECTION TEMİZLE
+        */
+
+        document.addEventListener(
+            "mouseup",
+            () => {
+
+                const selection =
+                    window.getSelection();
+
+
+                if (selection) {
+
+                    selection.removeAllRanges();
+
+                }
+
+            }
+        );
+
+
+        /*
+            CTRL + A KAPALI
+        */
+
+        document.addEventListener(
+            "keydown",
+            (event) => {
+
+                const key =
+                    event.key.toLowerCase();
+
+
+                if (
+                    (
+                        event.ctrlKey ||
+                        event.metaKey
+                    ) &&
+                    key === "a"
+                ) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
 
     }
 
@@ -206,9 +305,6 @@
                     performance.now();
 
 
-                /*
-                    Particle sayısını sınırlıyoruz.
-                */
                 if (
                     now -
                     lastSpark >
@@ -230,9 +326,6 @@
         );
 
 
-        /*
-            Smooth cursor loop.
-        */
         function animateCursor() {
 
             cursorX +=
@@ -252,11 +345,13 @@
 
 
             customCursor.style.left =
-                cursorX + "px";
+                cursorX +
+                "px";
 
 
             customCursor.style.top =
-                cursorY + "px";
+                cursorY +
+                "px";
 
 
             requestAnimationFrame(
@@ -269,9 +364,6 @@
         animateCursor();
 
 
-        /*
-            CLICK
-        */
         document.addEventListener(
             "mousedown",
             () => {
@@ -296,16 +388,13 @@
         );
 
 
-        /*
-            HOVER
-        */
         document.addEventListener(
             "mouseover",
             (event) => {
 
                 const target =
                     event.target.closest(
-                        "a, button, .profile-picture"
+                        "a, button, .profile-picture, .role-badge"
                     );
 
 
@@ -327,7 +416,7 @@
 
                 const target =
                     event.target.closest(
-                        "a, button, .profile-picture"
+                        "a, button, .profile-picture, .role-badge"
                     );
 
 
@@ -343,9 +432,6 @@
         );
 
 
-        /*
-            Browser dışına çıkınca gizle.
-        */
         document.documentElement.addEventListener(
             "mouseleave",
             () => {
@@ -378,6 +464,11 @@
         x,
         y
     ) {
+
+        if (isTouchDevice) {
+            return;
+        }
+
 
         const spark =
             document.createElement(
@@ -412,22 +503,26 @@
 
 
         spark.style.left =
-            x + "px";
+            x +
+            "px";
 
 
         spark.style.top =
-            y + "px";
+            y +
+            "px";
 
 
         spark.style.setProperty(
             "--x",
-            dx + "px"
+            dx +
+            "px"
         );
 
 
         spark.style.setProperty(
             "--y",
-            dy + "px"
+            dy +
+            "px"
         );
 
 
@@ -501,7 +596,7 @@
 
 
     /* ========================================
-       CLICK TO ENTER TYPEWRITER
+       START TYPEWRITER
     ======================================== */
 
     function initializeStartText() {
@@ -515,7 +610,7 @@
             0;
 
 
-        let currentText =
+        let typedText =
             "";
 
 
@@ -534,11 +629,10 @@
                 START_MESSAGE.length
             ) {
 
-                index +=
-                    1;
+                index++;
 
 
-                currentText =
+                typedText =
                     START_MESSAGE.slice(
                         0,
                         index
@@ -546,7 +640,7 @@
 
 
                 startText.textContent =
-                    currentText +
+                    typedText +
                     "|";
 
 
@@ -576,7 +670,7 @@
 
 
                 startText.textContent =
-                    currentText +
+                    typedText +
                     (
                         cursorVisible
                             ? "|"
@@ -621,8 +715,7 @@
                 text.length
             ) {
 
-                index +=
-                    1;
+                index++;
 
 
                 element.textContent =
@@ -636,7 +729,7 @@
                 if (
                     glitch &&
                     Math.random() <
-                        0.07
+                    0.07
                 ) {
 
                     element.classList.add(
@@ -679,7 +772,125 @@
 
 
     /* ========================================
-       MUSIC
+       MUSIC INITIALIZE
+    ======================================== */
+
+    function initializeMusic() {
+
+        if (!music) {
+            return;
+        }
+
+
+        music.volume =
+            MUSIC_VOLUME;
+
+
+        music.loop =
+            true;
+
+
+        music.preload =
+            "auto";
+
+
+        music.muted =
+            false;
+
+
+        restoreMusicPosition();
+
+    }
+
+
+    /* ========================================
+       RESTORE MUSIC POSITION
+    ======================================== */
+
+    function restoreMusicPosition() {
+
+        if (!music) {
+            return;
+        }
+
+
+        const savedTime =
+            Number.parseFloat(
+                storageGet(
+                    MUSIC_TIME_KEY
+                )
+            );
+
+
+        if (
+            !Number.isFinite(
+                savedTime
+            ) ||
+            savedTime <= 0
+        ) {
+
+            return;
+
+        }
+
+
+        function applyPosition() {
+
+            try {
+
+                if (
+                    Number.isFinite(
+                        music.duration
+                    ) &&
+                    music.duration > 0
+                ) {
+
+                    music.currentTime =
+                        savedTime %
+                        music.duration;
+
+                } else {
+
+                    music.currentTime =
+                        savedTime;
+
+                }
+
+            } catch (error) {
+
+                console.warn(
+                    "Music position error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        if (
+            music.readyState >= 1
+        ) {
+
+            applyPosition();
+
+        } else {
+
+            music.addEventListener(
+                "loadedmetadata",
+                applyPosition,
+                {
+                    once: true
+                }
+            );
+
+        }
+
+    }
+
+
+    /* ========================================
+       PLAY MUSIC
     ======================================== */
 
     function playMusic() {
@@ -690,7 +901,7 @@
 
 
         music.volume =
-            0.35;
+            MUSIC_VOLUME;
 
 
         music.loop =
@@ -701,26 +912,21 @@
             false;
 
 
-        const promise =
+        const playPromise =
             music.play();
 
 
         if (
-            promise &&
-            typeof promise.catch ===
-                "function"
+            playPromise &&
+            typeof playPromise.catch ===
+            "function"
         ) {
 
-            promise.catch(
+            playPromise.catch(
                 (error) => {
 
-                    /*
-                        Yenileme sonrası tarayıcı
-                        autoplay'i engelleyebilir.
-                        Bu siteyi bozmaz.
-                    */
                     console.warn(
-                        "Music autoplay blocked:",
+                        "music.mp3 oynatılamadı:",
                         error
                     );
 
@@ -733,10 +939,83 @@
 
 
     /* ========================================
-       ENTER SITE
+       SAVE MUSIC POSITION
+    ======================================== */
+
+    function saveMusicPosition() {
+
+        if (!music) {
+            return;
+        }
+
+
+        if (
+            !Number.isFinite(
+                music.currentTime
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        storageSet(
+            MUSIC_TIME_KEY,
+            String(
+                music.currentTime
+            )
+        );
+
+    }
+
+
+    setInterval(
+        saveMusicPosition,
+        1000
+    );
+
+
+    window.addEventListener(
+        "pagehide",
+        saveMusicPosition
+    );
+
+
+    window.addEventListener(
+        "beforeunload",
+        saveMusicPosition
+    );
+
+
+    document.addEventListener(
+        "visibilitychange",
+        () => {
+
+            if (
+                document.hidden
+            ) {
+
+                saveMusicPosition();
+
+            }
+
+        }
+    );
+
+
+    /* ========================================
+       ENTER WEBSITE
     ======================================== */
 
     function enterSite() {
+
+        /*
+            OTOMATİK AÇILMA YOK.
+
+            Her refresh sonrası
+            tekrar Click To Enter gerekir.
+        */
 
         if (entered) {
             return;
@@ -747,12 +1026,6 @@
             true;
 
 
-        storageSet(
-            ENTER_KEY,
-            "yes"
-        );
-
-
         if (startScreen) {
 
             startScreen.classList.add(
@@ -761,6 +1034,11 @@
 
         }
 
+
+        /*
+            Gerçek kullanıcı tıklaması
+            olduğu için müzik burada başlar.
+        */
 
         playMusic();
 
@@ -779,7 +1057,8 @@
                 typeText(
                     profileBio,
                     PROFILE_BIO,
-                    27
+                    27,
+                    false
                 );
 
             },
@@ -790,73 +1069,7 @@
 
 
     /* ========================================
-       REFRESH FIX
-    ======================================== */
-
-    function restoreAfterRefresh() {
-
-        const wasEntered =
-            storageGet(
-                ENTER_KEY
-            ) === "yes";
-
-
-        if (!wasEntered) {
-
-            return;
-
-        }
-
-
-        /*
-            F5 sonrası giriş ekranını
-            direkt kaldırıyoruz.
-        */
-        entered =
-            true;
-
-
-        if (startScreen) {
-
-            startScreen.classList.add(
-                "hidden"
-            );
-
-        }
-
-
-        /*
-            Typewriter tekrar çalıştırma.
-            Direkt normal yazıları koy.
-        */
-        if (profileName) {
-
-            profileName.textContent =
-                PROFILE_NAME;
-
-        }
-
-
-        if (profileBio) {
-
-            profileBio.textContent =
-                PROFILE_BIO;
-
-        }
-
-
-        /*
-            Burada playMusic() çağırmıyoruz.
-            Çünkü browser refresh sonrası
-            kullanıcı etkileşimi olmadan
-            autoplay'i engeller.
-        */
-
-    }
-
-
-    /* ========================================
-       3D PROFILE MOVEMENT
+       PROFILE 3D MOVEMENT
     ======================================== */
 
     function initializeProfileMovement() {
@@ -911,13 +1124,19 @@
             5;
 
 
-        /*
-            Tüm ekran mouse konumuna göre
-            kartı hafif hareket ettirir.
-        */
         document.addEventListener(
             "mousemove",
             (event) => {
+
+                /*
+                    Click To Enter yapılmadan
+                    profil hareket etmez.
+                */
+
+                if (!entered) {
+                    return;
+                }
+
 
                 const halfWidth =
                     window.innerWidth /
@@ -993,15 +1212,12 @@
 
         function animateProfile() {
 
-            /*
-                LERP
-            */
             currentRotateX +=
                 (
                     targetRotateX -
                     currentRotateX
                 ) *
-                0.075;
+                0.08;
 
 
             currentRotateY +=
@@ -1009,7 +1225,7 @@
                     targetRotateY -
                     currentRotateY
                 ) *
-                0.075;
+                0.08;
 
 
             currentMoveX +=
@@ -1017,7 +1233,7 @@
                     targetMoveX -
                     currentMoveX
                 ) *
-                0.075;
+                0.08;
 
 
             currentMoveY +=
@@ -1025,16 +1241,9 @@
                     targetMoveY -
                     currentMoveY
                 ) *
-                0.075;
+                0.08;
 
 
-            /*
-                Burada translate(-50%)
-                YOK.
-
-                Çünkü merkezleme profile-wrapper
-                tarafından yapılıyor.
-            */
             profileBlock.style.transform =
                 `
                     translate3d(
@@ -1116,7 +1325,7 @@
 
 
     /* ========================================
-       ENTER EVENTS
+       START SCREEN EVENTS
     ======================================== */
 
     if (startScreen) {
@@ -1129,9 +1338,15 @@
 
         startScreen.addEventListener(
             "touchstart",
-            enterSite,
+            (event) => {
+
+                event.preventDefault();
+
+                enterSite();
+
+            },
             {
-                passive: true
+                passive: false
             }
         );
 
@@ -1139,8 +1354,10 @@
 
 
     /* ========================================
-       START EVERYTHING
+       INITIALIZE
     ======================================== */
+
+    initializeProtection();
 
     initializeCursor();
 
@@ -1148,10 +1365,10 @@
 
     initializeStartText();
 
+    initializeMusic();
+
     initializeProfileMovement();
 
     initializeAvatarEffect();
-
-    restoreAfterRefresh();
 
 })();
