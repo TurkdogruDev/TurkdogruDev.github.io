@@ -1,589 +1,835 @@
-(() => {
-    "use strict";
+:root {
+    --white: #ffffff;
+    --soft-white: rgba(255, 255, 255, 0.75);
+    --border: rgba(255, 255, 255, 0.75);
+    --panel: rgba(4, 4, 4, 0.72);
+}
 
-    const PROFILE_NAME = "TurkdogruDev/T.Dev";
+/* RESET */
 
-    const PROFILE_BIO =
-        "I dont know what to put but my favorite color is white.";
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    const GITHUB_USERNAME =
-        "TurkdogruDev";
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
 
-    /*
-        COUNTER
+html {
+    background: #000;
+}
 
-        First visit:
-        10,258
+body {
+    min-height: 100vh;
+    overflow: hidden;
 
-        After that:
-        10,259
-        10,260
-        ...
-    */
+    color: white;
 
-    const COUNTER_KEY =
-        "turkdogrudev_profile_counter_v4";
-
-    const START_COUNT =
-        10258;
-
-    const startScreen =
-        document.getElementById("start-screen");
-
-    const profileCard =
-        document.getElementById("profile-card");
-
-    const profileName =
-        document.getElementById("profile-name");
-
-    const profileBio =
-        document.getElementById("profile-bio");
-
-    const profilePicture =
-        document.getElementById("profile-picture");
-
-    const visitorCount =
-        document.getElementById("visitor-count");
-
-    const backgroundMusic =
-        document.getElementById("background-music");
-
-    const customCursor =
-        document.getElementById("custom-cursor");
-
-    let entered = false;
+    font-family:
+        "Courier New",
+        Courier,
+        monospace;
 
     /*
-        CUSTOM CURSOR
+        NORMAL SYSTEM CURSOR HIDDEN.
+        ONLY OUR WEBSITE CURSOR IS VISIBLE.
     */
+    cursor: none !important;
+}
 
-    function initCursor() {
+body *,
+a,
+button,
+img {
+    cursor: none !important;
+}
 
-        if (!customCursor) {
-            return;
-        }
+/* BACKGROUND */
 
-        const touchDevice =
-            window.matchMedia(
-                "(pointer: coarse)"
-            ).matches;
+.background {
+    position: fixed;
+    inset: 0;
 
-        if (touchDevice) {
-            return;
-        }
+    z-index: -3;
 
-        document.addEventListener(
-            "mousemove",
-            (event) => {
+    background-image:
+        url("https://i.giphy.com/ZOGCyj0NW28gg.webp");
 
-                customCursor.style.left =
-                    `${event.clientX}px`;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 
-                customCursor.style.top =
-                    `${event.clientY}px`;
+    transform: scale(1.02);
+}
 
-            }
+.background-overlay {
+    position: fixed;
+    inset: 0;
+
+    z-index: -2;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(0, 0, 0, 0.05),
+            rgba(0, 0, 0, 0.36)
         );
+}
 
-        document.addEventListener(
-            "mousedown",
-            () => {
+/* CUSTOM WEBSITE CURSOR */
 
-                document.body.classList.add(
-                    "cursor-down"
-                );
+#custom-cursor {
+    position: fixed;
 
-            }
-        );
+    top: -100px;
+    left: -100px;
 
-        document.addEventListener(
-            "mouseup",
-            () => {
+    width: 18px;
+    height: 18px;
 
-                document.body.classList.remove(
-                    "cursor-down"
-                );
+    border: 2px solid white;
+    border-radius: 50%;
 
-            }
-        );
+    pointer-events: none;
 
-        window.addEventListener(
-            "blur",
-            () => {
+    z-index: 999999;
 
-                customCursor.style.left =
-                    "-100px";
+    transform:
+        translate(-50%, -50%);
 
-                customCursor.style.top =
-                    "-100px";
+    box-shadow:
+        0 0 8px white,
+        0 0 18px rgba(255, 255, 255, 0.6);
 
-            }
-        );
+    transition:
+        width 0.15s ease,
+        height 0.15s ease,
+        background 0.15s ease;
+}
 
+body.cursor-down #custom-cursor {
+    width: 12px;
+    height: 12px;
+
+    background: white;
+}
+
+/* START SCREEN */
+
+#start-screen {
+    position: fixed;
+    inset: 0;
+
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(0, 0, 0, 0.68);
+
+    backdrop-filter:
+        blur(9px);
+
+    transition:
+        opacity 0.7s ease,
+        visibility 0.7s ease;
+}
+
+#start-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#start-text {
+    color: white;
+
+    font-size:
+        clamp(22px, 4vw, 42px);
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    text-shadow:
+        0 0 10px white,
+        0 0 30px rgba(255, 255, 255, 0.65);
+
+    animation:
+        startPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes startPulse {
+
+    0%,
+    100% {
+        opacity: 0.65;
+        transform: scale(1);
     }
 
-    /*
-        GITHUB AVATAR
-    */
-
-    function loadGitHubAvatar() {
-
-        if (!profilePicture) {
-            return;
-        }
-
-        /*
-            Direct image works even if
-            GitHub API limit is reached.
-        */
-
-        profilePicture.src =
-            `https://github.com/${GITHUB_USERNAME}.png?size=300`;
-
-        fetch(
-            `https://api.github.com/users/${GITHUB_USERNAME}`
-        )
-            .then((response) => {
-
-                if (!response.ok) {
-                    throw new Error(
-                        "GitHub API error"
-                    );
-                }
-
-                return response.json();
-
-            })
-
-            .then((data) => {
-
-                if (data.avatar_url) {
-
-                    profilePicture.src =
-                        data.avatar_url;
-
-                }
-
-            })
-
-            .catch(() => {
-
-                /*
-                    Direct github avatar stays.
-                */
-
-            });
-
+    50% {
+        opacity: 1;
+        transform: scale(1.04);
     }
+}
 
-    /*
-        VISITOR COUNTER
-    */
+/* PAGE */
 
-    function initCounter() {
+.page {
+    position: relative;
 
-        if (!visitorCount) {
-            return;
-        }
+    width: 100%;
+    height: 100vh;
 
-        const storedValue =
-            localStorage.getItem(
-                COUNTER_KEY
-            );
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-        let count;
+    padding: 25px;
 
-        /*
-            No value yet:
-            display exactly 10,258.
-        */
+    perspective: 1200px;
+}
 
-        if (storedValue === null) {
+/* PROFILE CARD */
 
-            count =
-                START_COUNT;
+.profile-card {
+    position: relative;
 
-        } else {
+    width:
+        min(820px, 92vw);
 
-            const parsed =
-                Number.parseInt(
-                    storedValue,
-                    10
-                );
+    min-height: 470px;
 
-            if (
-                Number.isNaN(parsed) ||
-                parsed < START_COUNT
-            ) {
+    padding: 28px;
 
-                count =
-                    START_COUNT;
+    overflow: hidden;
 
-            } else {
+    border:
+        1px solid rgba(255, 255, 255, 0.85);
 
-                count =
-                    parsed + 1;
+    border-radius: 20px;
 
-            }
-
-        }
-
-        localStorage.setItem(
-            COUNTER_KEY,
-            String(count)
+    background:
+        linear-gradient(
+            145deg,
+            rgba(0, 0, 0, 0.80),
+            rgba(25, 25, 25, 0.64)
         );
 
-        visitorCount.textContent =
-            count.toLocaleString(
-                "en-US"
-            );
+    backdrop-filter:
+        blur(14px);
 
-    }
+    box-shadow:
+        0 20px 80px rgba(0, 0, 0, 0.75),
+        inset 0 0 35px rgba(255, 255, 255, 0.04);
 
-    /*
-        TYPEWRITER
-    */
+    transform-style:
+        preserve-3d;
 
-    function typeWriter(
-        element,
-        text,
-        speed = 50
-    ) {
+    opacity: 1;
 
-        if (!element) {
-            return;
-        }
+    transition:
+        transform 0.12s linear,
+        opacity 0.7s ease,
+        box-shadow 0.3s ease;
+}
 
-        element.textContent = "";
+.profile-card.hidden {
+    opacity: 0;
 
-        let index = 0;
+    transform:
+        translateY(30px)
+        scale(0.96);
 
-        function write() {
+    pointer-events: none;
+}
 
-            if (
-                index <
-                text.length
-            ) {
+.profile-card.visible {
+    opacity: 1;
+}
 
-                element.textContent =
-                    text.substring(
-                        0,
-                        index + 1
-                    ) + "|";
+/* moving white reflection */
 
-                index++;
+.shine {
+    position: absolute;
 
-                setTimeout(
-                    write,
-                    speed
-                );
+    width: 300px;
+    height: 900px;
 
-            } else {
+    top: -220px;
+    left: -450px;
 
-                element.textContent =
-                    text;
+    pointer-events: none;
 
-            }
-
-        }
-
-        write();
-
-    }
-
-    /*
-        MUSIC
-    */
-
-    async function playMusic() {
-
-        if (!backgroundMusic) {
-            return;
-        }
-
-        try {
-
-            backgroundMusic.volume =
-                0.4;
-
-            backgroundMusic.loop =
-                true;
-
-            await backgroundMusic.play();
-
-        } catch (error) {
-
-            console.warn(
-                "music.mp3 başlatılamadı:",
-                error
-            );
-
-        }
-
-    }
-
-    /*
-        ENTER WEBSITE
-    */
-
-    function enterWebsite() {
-
-        if (entered) {
-            return;
-        }
-
-        entered = true;
-
-        if (startScreen) {
-
-            startScreen.classList.add(
-                "hidden"
-            );
-
-        }
-
-        if (profileCard) {
-
-            profileCard.classList.remove(
-                "hidden"
-            );
-
-            requestAnimationFrame(
-                () => {
-
-                    profileCard.classList.add(
-                        "visible"
-                    );
-
-                }
-            );
-
-        }
-
-        /*
-            Click is a user interaction,
-            therefore browser allows audio.
-        */
-
-        playMusic();
-
-        typeWriter(
-            profileName,
-            PROFILE_NAME,
-            65
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.075),
+            transparent
         );
 
-        setTimeout(
-            () => {
+    transform:
+        rotate(25deg);
 
-                typeWriter(
-                    profileBio,
-                    PROFILE_BIO,
-                    25
-                );
+    animation:
+        cardShine 9s linear infinite;
+}
 
-            },
-            350
-        );
+@keyframes cardShine {
 
+    0% {
+        left: -450px;
     }
 
-    /*
-        3D CARD MOVEMENT
-    */
+    100% {
+        left: 1100px;
+    }
+}
 
-    function initCardTilt() {
+/* PROFILE TOP */
 
-        if (!profileCard) {
-            return;
-        }
+.profile-top {
+    position: relative;
 
-        const touchDevice =
-            window.matchMedia(
-                "(pointer: coarse)"
-            ).matches;
+    display: flex;
+    align-items: center;
 
-        if (touchDevice) {
-            return;
-        }
+    gap: 32px;
 
-        let targetX = 0;
-        let targetY = 0;
+    min-height: 210px;
 
-        let currentX = 0;
-        let currentY = 0;
+    z-index: 2;
 
-        let animationFrame;
+    transform:
+        translateZ(30px);
+}
 
-        function animate() {
+/* AVATAR */
 
-            /*
-                Smooth interpolation
-            */
+.avatar-wrapper {
+    position: relative;
 
-            currentX +=
-                (targetX - currentX) *
-                0.09;
+    flex:
+        0 0 180px;
 
-            currentY +=
-                (targetY - currentY) *
-                0.09;
+    width: 180px;
+    height: 180px;
 
-            profileCard.style.transform =
-                `
-                rotateX(${currentX}deg)
-                rotateY(${currentY}deg)
-                translateZ(0)
-                `;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-            animationFrame =
-                requestAnimationFrame(
-                    animate
-                );
+    transform-style:
+        preserve-3d;
+}
 
-        }
+.profile-picture {
+    position: relative;
 
-        profileCard.addEventListener(
-            "mousemove",
-            (event) => {
+    z-index: 3;
 
-                const rect =
-                    profileCard.getBoundingClientRect();
+    width: 154px;
+    height: 154px;
 
-                const mouseX =
-                    event.clientX -
-                    rect.left;
+    border-radius: 50%;
 
-                const mouseY =
-                    event.clientY -
-                    rect.top;
+    object-fit: cover;
 
-                const centerX =
-                    rect.width / 2;
+    border:
+        2px solid white;
 
-                const centerY =
-                    rect.height / 2;
+    background: #111;
 
-                /*
-                    Maximum rotation.
-                    Reduce these numbers if
-                    you want less movement.
-                */
+    box-shadow:
+        0 0 10px white,
+        0 0 30px rgba(255, 255, 255, 0.7),
+        0 0 55px rgba(255, 255, 255, 0.3);
 
-                const MAX_ROTATE =
-                    7;
+    transition:
+        transform 0.3s ease;
+}
 
-                targetY =
-                    (
-                        (mouseX - centerX) /
-                        centerX
-                    ) * MAX_ROTATE;
+.profile-picture:hover {
+    transform:
+        scale(1.04)
+        translateZ(12px);
+}
 
-                targetX =
-                    -
-                    (
-                        (mouseY - centerY) /
-                        centerY
-                    ) * MAX_ROTATE;
+/* WHITE ROTATING BORDER */
 
-            }
+.avatar-orbit {
+    position: absolute;
+
+    z-index: 1;
+
+    width: 174px;
+    height: 174px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            transparent 0deg,
+            transparent 45deg,
+            rgba(255, 255, 255, 0.3) 75deg,
+            white 100deg,
+            white 130deg,
+            transparent 160deg,
+            transparent 260deg,
+            rgba(255, 255, 255, 0.5) 300deg,
+            white 325deg,
+            transparent 360deg
         );
 
-        profileCard.addEventListener(
-            "mouseleave",
-            () => {
+    animation:
+        avatarSpin 3.4s linear infinite;
 
-                targetX = 0;
-                targetY = 0;
+    filter:
+        drop-shadow(0 0 7px white);
+}
 
-            }
-        );
+/* black inside hole */
 
-        animate();
+.avatar-orbit::after {
+    content: "";
 
+    position: absolute;
+
+    inset: 5px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(0, 0, 0, 0.94);
+}
+
+@keyframes avatarSpin {
+
+    from {
+        transform:
+            rotate(0deg);
     }
 
-    /*
-        OPTIONAL AVATAR CLICK EFFECT
-    */
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
 
-    function initAvatarEffect() {
+/* little orbit dots */
 
-        if (!profilePicture) {
-            return;
-        }
+.avatar-wrapper::before {
+    content: "";
 
-        profilePicture.addEventListener(
-            "click",
-            () => {
+    position: absolute;
 
-                profilePicture.animate(
-                    [
-                        {
-                            transform:
-                                "scale(1)"
-                        },
+    width: 235px;
+    height: 235px;
 
-                        {
-                            transform:
-                                "scale(0.94)"
-                        },
+    border-radius: 50%;
 
-                        {
-                            transform:
-                                "scale(1.06)"
-                        },
-
-                        {
-                            transform:
-                                "scale(1)"
-                        }
-                    ],
-                    {
-                        duration: 500,
-                        easing:
-                            "ease-out"
-                    }
-                );
-
-            }
+    background:
+        radial-gradient(
+            circle at 7% 50%,
+            white 0 3px,
+            transparent 4px
+        ),
+        radial-gradient(
+            circle at 12% 60%,
+            rgba(255,255,255,.7) 0 3px,
+            transparent 4px
+        ),
+        radial-gradient(
+            circle at 18% 67%,
+            rgba(255,255,255,.45) 0 2px,
+            transparent 3px
         );
 
+    animation:
+        dotsSpin 5s linear infinite;
+
+    pointer-events: none;
+}
+
+@keyframes dotsSpin {
+
+    from {
+        transform:
+            rotate(0deg);
     }
 
-    /*
-        START
-    */
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
 
-    initCursor();
+/* PROFILE TEXT */
 
-    loadGitHubAvatar();
+.profile-main {
+    flex: 1;
 
-    initCounter();
+    min-width: 0;
+}
 
-    initCardTilt();
+.name-row {
+    display: flex;
 
-    initAvatarEffect();
+    flex-direction: column;
 
-    /*
-        Enter events
-    */
+    align-items: flex-start;
 
-    if (startScreen) {
+    gap: 15px;
+}
 
-        startScreen.addEventListener(
-            "click",
-            enterWebsite
+#profile-name {
+    color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size:
+        clamp(28px, 5vw, 43px);
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    word-break:
+        break-word;
+
+    text-shadow:
+        0 0 8px white,
+        0 0 18px white,
+        0 0 38px rgba(255, 255, 255, 0.75);
+}
+
+#profile-bio {
+    margin-top: 32px;
+
+    max-width: 540px;
+
+    color:
+        rgba(255, 255, 255, 0.83);
+
+    font-size:
+        clamp(15px, 2vw, 20px);
+
+    line-height: 1.7;
+}
+
+/* BADGES */
+
+.badges {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+}
+
+.badge {
+    padding:
+        6px 10px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.38);
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    color:
+        rgba(255, 255, 255, 0.85);
+
+    font-size:
+        10px;
+
+    letter-spacing:
+        1px;
+
+    box-shadow:
+        inset 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+/* SEPARATOR */
+
+.separator {
+    width: 100%;
+    height: 1px;
+
+    margin:
+        22px 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.8),
+            transparent
         );
+}
 
-        startScreen.addEventListener(
-            "touchstart",
-            enterWebsite,
-            {
-                passive: true
-            }
-        );
+/* SOCIALS */
 
+.social-links {
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    padding: 13px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.18);
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(0, 0, 0, 0.55);
+
+    transform:
+        translateZ(22px);
+}
+
+.social-button {
+    min-height: 70px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius:
+        13px;
+
+    color: white;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.social-button svg {
+    width: 29px;
+    height: 29px;
+
+    fill: white;
+
+    filter:
+        drop-shadow(0 0 7px rgba(255, 255, 255, 0.7));
+}
+
+.social-button span {
+    font-size:
+        12px;
+
+    opacity:
+        0.86;
+}
+
+.social-button:hover {
+    transform:
+        translateY(-5px)
+        scale(1.04);
+
+    background:
+        rgba(255, 255, 255, 0.09);
+
+    box-shadow:
+        0 7px 25px rgba(255, 255, 255, 0.08);
+}
+
+/* FOOTER */
+
+.footer {
+    position: relative;
+
+    z-index: 2;
+
+    display: flex;
+
+    margin-top:
+        15px;
+
+    transform:
+        translateZ(15px);
+}
+
+.visitor-counter {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding:
+        10px 15px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.15);
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(255, 255, 255, 0.10);
+
+    color:
+        rgba(255, 255, 255, 0.9);
+
+    font-size:
+        14px;
+}
+
+.visitor-counter svg {
+    width: 19px;
+    height: 19px;
+
+    fill: none;
+    stroke: white;
+
+    stroke-width: 1.7;
+}
+
+/* MOBILE */
+
+@media (max-width: 680px) {
+
+    body {
+        overflow-y: auto;
     }
 
-})();
+    .page {
+        min-height: 100vh;
+        height: auto;
+
+        padding:
+            20px 12px;
+    }
+
+    .profile-card {
+        padding:
+            20px;
+
+        min-height:
+            unset;
+    }
+
+    .profile-top {
+        flex-direction:
+            column;
+
+        text-align:
+            center;
+
+        gap:
+            12px;
+    }
+
+    .avatar-wrapper {
+        width:
+            145px;
+
+        height:
+            145px;
+
+        flex-basis:
+            145px;
+    }
+
+    .profile-picture {
+        width:
+            125px;
+
+        height:
+            125px;
+    }
+
+    .avatar-orbit {
+        width:
+            141px;
+
+        height:
+            141px;
+    }
+
+    .avatar-wrapper::before {
+        width:
+            190px;
+
+        height:
+            190px;
+    }
+
+    .name-row {
+        align-items:
+            center;
+    }
+
+    #profile-name {
+        font-size:
+            27px;
+    }
+
+    #profile-bio {
+        margin-top:
+            18px;
+
+        text-align:
+            center;
+    }
+
+    .badges {
+        justify-content:
+            center;
+    }
+
+    .social-links {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+/* TOUCH DEVICES */
+
+@media (pointer: coarse) {
+
+    body,
+    body *,
+    a,
+    button,
+    img {
+        cursor: auto !important;
+    }
+
+    #custom-cursor {
+        display: none;
+    }
+
+}
