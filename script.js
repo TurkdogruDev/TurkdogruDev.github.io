@@ -24,11 +24,11 @@
 
 
     const COUNTER_KEY =
-        "turkdogrudev_profile_views_v50";
+        "turkdogrudev_profile_views_v60";
 
 
     const MUSIC_TIME_KEY =
-        "turkdogrudev_music_position_v50";
+        "turkdogrudev_music_position_v60";
 
 
     const MUSIC_VOLUME =
@@ -149,13 +149,13 @@
 
 
     /* ========================================
-       RIGHT CLICK / DRAG / SELECT BLOCK
+       RIGHT CLICK / SELECTION / DRAG BLOCK
     ======================================== */
 
     function initializeProtection() {
 
         /*
-            SAĞ TIK MENÜSÜ KAPALI
+            SAĞ TIK ENGELLE
         */
 
         document.addEventListener(
@@ -169,7 +169,7 @@
 
 
         /*
-            MOUSE İLE MAVİ TEXT SEÇİMİ KAPALI
+            YAZI SEÇİMİNİ ENGELLE
         */
 
         document.addEventListener(
@@ -183,7 +183,7 @@
 
 
         /*
-            IMAGE / LINK / SVG DRAG KAPALI
+            IMAGE / LINK DRAG ENGELLE
         */
 
         document.addEventListener(
@@ -197,8 +197,8 @@
 
 
         /*
-            MOUSE BIRAKILDIĞINDA
-            VARSA SELECTION TEMİZLE
+            MOUSE BIRAKINCA
+            SEÇİM VARSA TEMİZLE
         */
 
         document.addEventListener(
@@ -220,7 +220,7 @@
 
 
         /*
-            CTRL + A KAPALI
+            CTRL + A ENGELLE
         */
 
         document.addEventListener(
@@ -328,6 +328,11 @@
 
         function animateCursor() {
 
+            /*
+                Template cursor mouse'u
+                hızlı ama hafif smooth takip eder.
+            */
+
             cursorX +=
                 (
                     mouseX -
@@ -364,6 +369,8 @@
         animateCursor();
 
 
+        /* CLICK */
+
         document.addEventListener(
             "mousedown",
             () => {
@@ -387,6 +394,8 @@
             }
         );
 
+
+        /* HOVER */
 
         document.addEventListener(
             "mouseover",
@@ -772,7 +781,7 @@
 
 
     /* ========================================
-       MUSIC INITIALIZE
+       MUSIC
     ======================================== */
 
     function initializeMusic() {
@@ -790,12 +799,12 @@
             true;
 
 
-        music.preload =
-            "auto";
-
-
         music.muted =
             false;
+
+
+        music.preload =
+            "auto";
 
 
         restoreMusicPosition();
@@ -838,6 +847,11 @@
 
             try {
 
+                /*
+                    Şarkının süresini geçiyorsa
+                    başa sar.
+                */
+
                 if (
                     Number.isFinite(
                         music.duration
@@ -859,7 +873,7 @@
             } catch (error) {
 
                 console.warn(
-                    "Music position error:",
+                    "Music position restore error:",
                     error
                 );
 
@@ -919,7 +933,7 @@
         if (
             playPromise &&
             typeof playPromise.catch ===
-            "function"
+                "function"
         ) {
 
             playPromise.catch(
@@ -944,15 +958,27 @@
 
     function saveMusicPosition() {
 
-        if (!music) {
+        /*
+            Click To Enter yapılmadan
+            0 saniyeyi kaydedip eski
+            konumu bozmasın.
+        */
+
+        if (
+            !music ||
+            !entered
+        ) {
+
             return;
+
         }
 
 
         if (
             !Number.isFinite(
                 music.currentTime
-            )
+            ) ||
+            music.currentTime <= 0
         ) {
 
             return;
@@ -970,10 +996,18 @@
     }
 
 
-    setInterval(
-        saveMusicPosition,
-        1000
-    );
+    /*
+        Müzik ilerledikçe konumu kaydet.
+    */
+
+    if (music) {
+
+        music.addEventListener(
+            "timeupdate",
+            saveMusicPosition
+        );
+
+    }
 
 
     window.addEventListener(
@@ -992,9 +1026,7 @@
         "visibilitychange",
         () => {
 
-            if (
-                document.hidden
-            ) {
+            if (document.hidden) {
 
                 saveMusicPosition();
 
@@ -1005,16 +1037,14 @@
 
 
     /* ========================================
-       ENTER WEBSITE
+       ENTER SITE
     ======================================== */
 
     function enterSite() {
 
         /*
-            OTOMATİK AÇILMA YOK.
-
-            Her refresh sonrası
-            tekrar Click To Enter gerekir.
+            Her F5 sonrası yeniden
+            Click To Enter gerekir.
         */
 
         if (entered) {
@@ -1036,8 +1066,8 @@
 
 
         /*
-            Gerçek kullanıcı tıklaması
-            olduğu için müzik burada başlar.
+            Müzik sadece gerçek
+            kullanıcı tıklamasından sonra.
         */
 
         playMusic();
@@ -1127,11 +1157,6 @@
         document.addEventListener(
             "mousemove",
             (event) => {
-
-                /*
-                    Click To Enter yapılmadan
-                    profil hareket etmez.
-                */
 
                 if (!entered) {
                     return;
@@ -1273,7 +1298,7 @@
 
 
     /* ========================================
-       AVATAR CLICK EFFECT
+       AVATAR CLICK
     ======================================== */
 
     function initializeAvatarEffect() {
@@ -1325,7 +1350,7 @@
 
 
     /* ========================================
-       START SCREEN EVENTS
+       CLICK TO ENTER EVENTS
     ======================================== */
 
     if (startScreen) {
