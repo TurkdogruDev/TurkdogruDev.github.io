@@ -2,8 +2,9 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
 <title></title>
 
 <style>
@@ -11,9 +12,11 @@
     box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
     margin:0;
     width:100%;
+    height:100%;
     min-height:100%;
     background:#090909;
     color:#f4f4f5;
@@ -21,6 +24,7 @@ html,body{
 }
 
 body{
+    min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -30,6 +34,8 @@ body{
 .box{
     width:100%;
     max-width:430px;
+    margin:auto;
+    text-align:center;
 }
 
 h1{
@@ -40,51 +46,109 @@ h1{
 }
 
 p{
-    margin:0;
+    width:100%;
+    margin:0 auto;
     color:#9a9a9a;
     font-size:14px;
     line-height:1.6;
 }
 
 .actions{
+    width:100%;
     display:flex;
+    align-items:stretch;
+    justify-content:center;
     gap:10px;
     margin-top:24px;
 }
 
 button{
-    height:44px;
-    border-radius:8px;
+    min-height:46px;
     border:1px solid #282828;
+    border-radius:9px;
+    font-family:inherit;
     font-size:14px;
     font-weight:500;
     cursor:pointer;
-    transition:.2s;
+    transition:
+        background .2s,
+        color .2s,
+        border-color .2s,
+        opacity .2s;
 }
 
 #cancel{
     width:100px;
+    flex:none;
     background:#111;
     color:#aaa;
 }
 
 #accept{
     flex:1;
+    min-width:0;
     background:#f4f4f5;
     color:#090909;
     border-color:#f4f4f5;
 }
 
 #accept:disabled{
-    background:#161616;
+    background:#151515;
     color:#555;
     border-color:#222;
     cursor:not-allowed;
 }
 
 #accept.loading{
-    pointer-events:none;
     opacity:.65;
+    pointer-events:none;
+}
+
+@media(max-width:480px){
+    body{
+        padding:18px;
+    }
+
+    .box{
+        max-width:360px;
+    }
+
+    h1{
+        font-size:19px;
+    }
+
+    p{
+        font-size:13px;
+        line-height:1.55;
+    }
+
+    .actions{
+        flex-direction:column;
+    }
+
+    #cancel,
+    #accept{
+        width:100%;
+        flex:none;
+    }
+
+    #accept{
+        order:1;
+    }
+
+    #cancel{
+        order:2;
+    }
+}
+
+@media(max-height:520px){
+    body{
+        height:auto;
+        min-height:100vh;
+        align-items:flex-start;
+        padding-top:25px;
+        padding-bottom:25px;
+    }
 }
 </style>
 </head>
@@ -126,7 +190,8 @@ const DB=
 `https://mantledb.sh/v2/${NAMESPACE}`;
 
 function getOS(){
-    const ua=(navigator.userAgent||"").toLowerCase();
+    const ua=
+        (navigator.userAgent||"").toLowerCase();
 
     const platform=(
         navigator.userAgentData?.platform||
@@ -165,6 +230,7 @@ function getOS(){
 
     if(
         ua.includes("macintosh")||
+        ua.includes("mac os")||
         platform.includes("mac")
     ){
         return "Mac";
@@ -185,8 +251,12 @@ function getDay(){
 
     return[
         d.getUTCFullYear(),
-        String(d.getUTCMonth()+1).padStart(2,"0"),
-        String(d.getUTCDate()).padStart(2,"0")
+        String(
+            d.getUTCMonth()+1
+        ).padStart(2,"0"),
+        String(
+            d.getUTCDate()
+        ).padStart(2,"0")
     ].join("-");
 }
 
@@ -205,22 +275,28 @@ function getDateTime(){
     ).format(new Date());
 }
 
-async function fetchJSON(url,timeout=1400){
-    const controller=new AbortController();
+async function fetchJSON(
+    url,
+    timeout=1400
+){
+    const controller=
+        new AbortController();
 
-    const timer=setTimeout(
-        ()=>controller.abort(),
-        timeout
-    );
+    const timer=
+        setTimeout(
+            ()=>controller.abort(),
+            timeout
+        );
 
     try{
-        const response=await fetch(
-            url,
-            {
-                signal:controller.signal,
-                cache:"no-store"
-            }
-        );
+        const response=
+            await fetch(
+                url,
+                {
+                    signal:controller.signal,
+                    cache:"no-store"
+                }
+            );
 
         if(!response.ok){
             throw new Error();
@@ -234,17 +310,18 @@ async function fetchJSON(url,timeout=1400){
 }
 
 async function getNetwork(){
-    const results=await Promise.allSettled([
-        fetchJSON(
-            "https://ipwho.is/",
-            1400
-        ),
+    const results=
+        await Promise.allSettled([
+            fetchJSON(
+                "https://ipwho.is/",
+                1400
+            ),
 
-        fetchJSON(
-            "https://hackmyip.com/api/ip",
-            1400
-        )
-    ]);
+            fetchJSON(
+                "https://hackmyip.com/api/ip",
+                1400
+            )
+        ]);
 
     let country="XX";
     let countryName="Unknown";
@@ -253,8 +330,12 @@ async function getNetwork(){
     let flag="";
     let connection="Unknown";
 
-    if(results[0].status==="fulfilled"){
-        const geo=results[0].value||{};
+    if(
+        results[0].status===
+        "fulfilled"
+    ){
+        const geo=
+            results[0].value||{};
 
         if(geo.success!==false){
             country=
@@ -280,18 +361,31 @@ async function getNetwork(){
         }
     }
 
-    if(results[1].status==="fulfilled"){
+    if(
+        results[1].status===
+        "fulfilled"
+    ){
         const privacy=
-            results[1].value?.data?.privacy||
+            results[1].value
+                ?.data
+                ?.privacy||
             {};
 
-        if(privacy.is_vpn===true){
+        if(
+            privacy.is_vpn===true
+        ){
             connection="VPN";
         }
-        else if(privacy.is_datacenter===true){
+        else if(
+            privacy.is_datacenter===
+            true
+        ){
             connection="Hosting";
         }
-        else if(privacy.is_residential===true){
+        else if(
+            privacy.is_residential===
+            true
+        ){
             connection="Normal";
         }
     }
@@ -314,18 +408,22 @@ async function saveVisit(){
         timestamp:Date.now(),
         datetime:getDateTime(),
         country:network.country,
-        countryName:network.countryName,
+        countryName:
+            network.countryName,
         city:network.city,
         os:getOS(),
         isp:network.isp,
         flag:network.flag,
-        connection:network.connection
+        connection:
+            network.connection
     };
 
     const id=
         crypto.randomUUID
             ?crypto.randomUUID()
-            :`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+            :`${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2)}`;
 
     const body={};
 
@@ -334,30 +432,44 @@ async function saveVisit(){
     const endpoint=
         `${DB}/visits/${getDay()}`;
 
-    let response=await fetch(
-        endpoint,
-        {
-            method:"PATCH",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(body),
-            keepalive:true
-        }
-    );
-
-    if(response.status===404){
-        response=await fetch(
+    let response=
+        await fetch(
             endpoint,
             {
-                method:"POST",
+                method:"PATCH",
+
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":
+                        "application/json"
                 },
-                body:JSON.stringify(body),
+
+                body:
+                    JSON.stringify(body),
+
                 keepalive:true
             }
         );
+
+    if(
+        response.status===404
+    ){
+        response=
+            await fetch(
+                endpoint,
+                {
+                    method:"POST",
+
+                    headers:{
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(body),
+
+                    keepalive:true
+                }
+            );
     }
 
     if(response.ok){
@@ -365,13 +477,18 @@ async function saveVisit(){
             `https://mantledb.sh/v2/increment/${NAMESPACE}/stats`,
             {
                 method:"POST",
+
                 headers:{
-                    "Content-Type":"application/json"
+                    "Content-Type":
+                        "application/json"
                 },
-                body:JSON.stringify({
-                    key:"total",
-                    by:1
-                }),
+
+                body:
+                    JSON.stringify({
+                        key:"total",
+                        by:1
+                    }),
+
                 keepalive:true
             }
         );
@@ -379,53 +496,89 @@ async function saveVisit(){
 }
 
 const accept=
-    document.getElementById("accept");
+    document.getElementById(
+        "accept"
+    );
 
 const cancel=
-    document.getElementById("cancel");
+    document.getElementById(
+        "cancel"
+    );
 
 let seconds=3;
 
-const countdown=setInterval(()=>{
-    seconds--;
+accept.textContent=
+    seconds;
 
-    if(seconds>0){
-        accept.textContent=seconds;
-    }
-    else{
-        clearInterval(countdown);
+const countdown=
+    setInterval(
+        ()=>{
+            seconds--;
 
-        accept.disabled=false;
+            if(seconds>0){
+                accept.textContent=
+                    seconds;
+            }
+            else{
+                clearInterval(
+                    countdown
+                );
 
-        accept.textContent=
-            "Kabul Et ve Yönlendir";
-    }
-},1000);
+                accept.disabled=
+                    false;
+
+                accept.textContent=
+                    "Kabul Et ve Yönlendir";
+            }
+        },
+        1000
+    );
 
 cancel.addEventListener(
     "click",
     ()=>{
-        history.back();
+        if(
+            document.referrer
+        ){
+            history.back();
+        }
+        else{
+            window.location.href=
+                "about:blank";
+        }
     }
 );
 
 accept.addEventListener(
     "click",
     async()=>{
-        if(accept.disabled){
+        if(
+            accept.disabled
+        ){
             return;
         }
 
         accept.disabled=true;
-        accept.classList.add("loading");
-        accept.textContent="Yönlendiriliyor...";
+
+        cancel.disabled=true;
+
+        accept.classList.add(
+            "loading"
+        );
+
+        accept.textContent=
+            "Yönlendiriliyor...";
 
         try{
             await Promise.race([
                 saveVisit(),
+
                 new Promise(
                     resolve=>
-                        setTimeout(resolve,1800)
+                        setTimeout(
+                            resolve,
+                            1800
+                        )
                 )
             ]);
         }
