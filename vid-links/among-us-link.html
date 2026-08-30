@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,39 +7,114 @@
 <title></title>
 
 <style>
+*{
+    box-sizing:border-box;
+}
+
 html,body{
     margin:0;
     width:100%;
-    height:100%;
+    min-height:100%;
     background:#090909;
+    color:#f4f4f5;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 
 body{
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:20px;
 }
 
-.loader{
-    width:20px;
-    height:20px;
-    border:2px solid #222;
-    border-top-color:#777;
-    border-radius:50%;
-    animation:spin .65s linear infinite;
+.box{
+    width:100%;
+    max-width:430px;
 }
 
-@keyframes spin{
-    to{
-        transform:rotate(360deg);
-    }
+h1{
+    margin:0 0 12px;
+    font-size:20px;
+    font-weight:600;
+    letter-spacing:-.3px;
+}
+
+p{
+    margin:0;
+    color:#9a9a9a;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:24px;
+}
+
+button{
+    height:44px;
+    border-radius:8px;
+    border:1px solid #282828;
+    font-size:14px;
+    font-weight:500;
+    cursor:pointer;
+    transition:.2s;
+}
+
+#cancel{
+    width:100px;
+    background:#111;
+    color:#aaa;
+}
+
+#accept{
+    flex:1;
+    background:#f4f4f5;
+    color:#090909;
+    border-color:#f4f4f5;
+}
+
+#accept:disabled{
+    background:#161616;
+    color:#555;
+    border-color:#222;
+    cursor:not-allowed;
+}
+
+#accept.loading{
+    pointer-events:none;
+    opacity:.65;
 }
 </style>
 </head>
 
 <body>
 
-<div class="loader"></div>
+<div class="box">
+
+<h1>Ziyaret İstatistikleri</h1>
+
+<p>
+Ülke, şehir, ISP, VPN/hosting durumu ve tarih-saat bilgileri,
+videodan proje bağlantısına gelen trafiği ve videoya gelen etkileşimi
+değerlendirmek için kaydedilir. IP adresiniz saklanmaz.
+“Kabul Et ve Yönlendir” butonuna basarak bunu kabul edersiniz.
+</p>
+
+<div class="actions">
+
+<button id="cancel" type="button">
+İptal
+</button>
+
+<button id="accept" type="button" disabled>
+3
+</button>
+
+</div>
+
+</div>
 
 <script>
 const NAMESPACE="mete-counter-x8k92m413";
@@ -51,15 +126,13 @@ const DB=
 `https://mantledb.sh/v2/${NAMESPACE}`;
 
 function getOS(){
-    const ua=
-        (navigator.userAgent||"").toLowerCase();
+    const ua=(navigator.userAgent||"").toLowerCase();
 
-    const platform=
-        (
-            navigator.userAgentData?.platform||
-            navigator.platform||
-            ""
-        ).toLowerCase();
+    const platform=(
+        navigator.userAgentData?.platform||
+        navigator.platform||
+        ""
+    ).toLowerCase();
 
     if(
         ua.includes("android")||
@@ -110,14 +183,10 @@ function getOS(){
 function getDay(){
     const d=new Date();
 
-    return [
+    return[
         d.getUTCFullYear(),
-        String(
-            d.getUTCMonth()+1
-        ).padStart(2,"0"),
-        String(
-            d.getUTCDate()
-        ).padStart(2,"0")
+        String(d.getUTCMonth()+1).padStart(2,"0"),
+        String(d.getUTCDate()).padStart(2,"0")
     ].join("-");
 }
 
@@ -136,26 +205,22 @@ function getDateTime(){
     ).format(new Date());
 }
 
-async function fetchJSON(url,timeoutMs=1300){
-    const controller=
-        new AbortController();
+async function fetchJSON(url,timeout=1400){
+    const controller=new AbortController();
 
-    const timeout=
-        setTimeout(
-            ()=>controller.abort(),
-            timeoutMs
-        );
+    const timer=setTimeout(
+        ()=>controller.abort(),
+        timeout
+    );
 
     try{
-        const response=
-            await fetch(
-                url,
-                {
-                    signal:
-                        controller.signal,
-                    cache:"no-store"
-                }
-            );
+        const response=await fetch(
+            url,
+            {
+                signal:controller.signal,
+                cache:"no-store"
+            }
+        );
 
         if(!response.ok){
             throw new Error();
@@ -164,22 +229,22 @@ async function fetchJSON(url,timeoutMs=1300){
         return await response.json();
     }
     finally{
-        clearTimeout(timeout);
+        clearTimeout(timer);
     }
 }
 
 async function getNetwork(){
-    const results=
-        await Promise.allSettled([
-            fetchJSON(
-                "https://ipwho.is/",
-                1300
-            ),
-            fetchJSON(
-                "https://hackmyip.com/api/ip",
-                1300
-            )
-        ]);
+    const results=await Promise.allSettled([
+        fetchJSON(
+            "https://ipwho.is/",
+            1400
+        ),
+
+        fetchJSON(
+            "https://hackmyip.com/api/ip",
+            1400
+        )
+    ]);
 
     let country="XX";
     let countryName="Unknown";
@@ -188,11 +253,8 @@ async function getNetwork(){
     let flag="";
     let connection="Unknown";
 
-    if(
-        results[0].status==="fulfilled"
-    ){
-        const geo=
-            results[0].value||{};
+    if(results[0].status==="fulfilled"){
+        const geo=results[0].value||{};
 
         if(geo.success!==false){
             country=
@@ -218,9 +280,7 @@ async function getNetwork(){
         }
     }
 
-    if(
-        results[1].status==="fulfilled"
-    ){
+    if(results[1].status==="fulfilled"){
         const privacy=
             results[1].value?.data?.privacy||
             {};
@@ -228,14 +288,10 @@ async function getNetwork(){
         if(privacy.is_vpn===true){
             connection="VPN";
         }
-        else if(
-            privacy.is_datacenter===true
-        ){
+        else if(privacy.is_datacenter===true){
             connection="Hosting";
         }
-        else if(
-            privacy.is_residential===true
-        ){
+        else if(privacy.is_residential===true){
             connection="Normal";
         }
     }
@@ -269,9 +325,7 @@ async function saveVisit(){
     const id=
         crypto.randomUUID
             ?crypto.randomUUID()
-            :`${Date.now()}-${Math.random()
-                .toString(36)
-                .slice(2)}`;
+            :`${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
     const body={};
 
@@ -280,36 +334,30 @@ async function saveVisit(){
     const endpoint=
         `${DB}/visits/${getDay()}`;
 
-    let response=
-        await fetch(
+    let response=await fetch(
+        endpoint,
+        {
+            method:"PATCH",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(body),
+            keepalive:true
+        }
+    );
+
+    if(response.status===404){
+        response=await fetch(
             endpoint,
             {
-                method:"PATCH",
+                method:"POST",
                 headers:{
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type":"application/json"
                 },
-                body:
-                    JSON.stringify(body),
+                body:JSON.stringify(body),
                 keepalive:true
             }
         );
-
-    if(response.status===404){
-        response=
-            await fetch(
-                endpoint,
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                            "application/json"
-                    },
-                    body:
-                        JSON.stringify(body),
-                    keepalive:true
-                }
-            );
     }
 
     if(response.ok){
@@ -318,8 +366,7 @@ async function saveVisit(){
             {
                 method:"POST",
                 headers:{
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type":"application/json"
                 },
                 body:JSON.stringify({
                     key:"total",
@@ -331,34 +378,64 @@ async function saveVisit(){
     }
 }
 
-function wait(ms){
-    return new Promise(
-        resolve=>setTimeout(resolve,ms)
-    );
-}
+const accept=
+    document.getElementById("accept");
 
-(async()=>{
-    const started=
-        Date.now();
+const cancel=
+    document.getElementById("cancel");
 
-    await Promise.race([
-        saveVisit(),
-        wait(1850)
-    ]);
+let seconds=3;
 
-    const passed=
-        Date.now()-started;
+const countdown=setInterval(()=>{
+    seconds--;
 
-    if(passed<2000){
-        await wait(
-            2000-passed
+    if(seconds>0){
+        accept.textContent=seconds;
+    }
+    else{
+        clearInterval(countdown);
+
+        accept.disabled=false;
+
+        accept.textContent=
+            "Kabul Et ve Yönlendir";
+    }
+},1000);
+
+cancel.addEventListener(
+    "click",
+    ()=>{
+        history.back();
+    }
+);
+
+accept.addEventListener(
+    "click",
+    async()=>{
+        if(accept.disabled){
+            return;
+        }
+
+        accept.disabled=true;
+        accept.classList.add("loading");
+        accept.textContent="Yönlendiriliyor...";
+
+        try{
+            await Promise.race([
+                saveVisit(),
+                new Promise(
+                    resolve=>
+                        setTimeout(resolve,1800)
+                )
+            ]);
+        }
+        catch{}
+
+        window.location.replace(
+            REDIRECT
         );
     }
-
-    window.location.replace(
-        REDIRECT
-    );
-})();
+);
 </script>
 
 </body>
