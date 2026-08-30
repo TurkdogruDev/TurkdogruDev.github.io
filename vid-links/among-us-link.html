@@ -1,37 +1,36 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title></title>
 
 <style>
-html,
-body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    background: #09090b;
+html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    background:#090909;
 }
 
-body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.loader {
-    width: 26px;
-    height: 26px;
-    border: 2px solid #202024;
-    border-top-color: #888;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
+.loader{
+    width:20px;
+    height:20px;
+    border:2px solid #222;
+    border-top-color:#777;
+    border-radius:50%;
+    animation:spin .65s linear infinite;
 }
 
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
     }
 }
 </style>
@@ -42,252 +41,239 @@ body {
 <div class="loader"></div>
 
 <script>
-const NAMESPACE = "mete-x7k92m41-counter";
-const REDIRECT = "https://www.mediafire.com/file/zpdvgqnlmlkye70/T_Dev_Among_Us_v2026.8.18_Signed_Menu_v22.apk/file";
-const DB = `https://mantledb.sh/v2/${NAMESPACE}`;
+const NAMESPACE="mete-counter-x8k92m412";
+const REDIRECT="https://www.mediafire.com/file/zpdvgqnlmlkye70/T_Dev_Among_Us_v2026.8.18_Signed_Menu_v22.apk/file";
+const DB=`https://mantledb.sh/v2/${NAMESPACE}`;
 
-async function getSystem() {
-    const ua = navigator.userAgent || "";
-    const platform = navigator.platform || "";
-    const touch = navigator.maxTouchPoints || 0;
+async function getOS(){
+    const ua=navigator.userAgent||"";
+    let platform=navigator.platform||"";
 
-    if (navigator.userAgentData) {
-        try {
-            const data =
-                await navigator.userAgentData.getHighEntropyValues([
-                    "platform",
-                    "mobile",
-                    "model"
-                ]);
+    if(navigator.userAgentData){
+        try{
+            const data=await navigator.userAgentData.getHighEntropyValues([
+                "platform",
+                "mobile",
+                "model"
+            ]);
 
-            const p =
-                (data.platform || "").toLowerCase();
-
-            if (p.includes("android")) {
-                return "Android";
+            if(data.platform){
+                platform=data.platform;
             }
-
-            if (p.includes("windows")) {
-                return "Windows";
-            }
-
-            if (p.includes("mac")) {
-                return "Mac";
-            }
-
-            if (p.includes("linux")) {
-                return "Linux";
-            }
-
-            if (data.mobile && /android/i.test(ua)) {
-                return "Android";
-            }
-        } catch {}
+        }catch{}
     }
 
-    if (/android/i.test(ua)) {
+    const value=(ua+" "+platform).toLowerCase();
+
+    if(value.includes("android")){
         return "Android";
     }
 
-    if (/iphone|ipad|ipod/i.test(ua)) {
+    if(
+        value.includes("iphone")||
+        value.includes("ipad")||
+        value.includes("ipod")
+    ){
         return "iOS";
     }
 
-    if (
-        platform === "MacIntel" &&
-        touch > 1
-    ) {
+    if(
+        platform==="MacIntel" &&
+        navigator.maxTouchPoints>1
+    ){
         return "iOS";
     }
 
-    if (/windows/i.test(ua + " " + platform)) {
+    if(value.includes("windows")){
         return "Windows";
     }
 
-    if (/macintosh|mac os x|macintel/i.test(
-        ua + " " + platform
-    )) {
+    if(
+        value.includes("macintosh")||
+        value.includes("mac os")||
+        value.includes("macintel")
+    ){
         return "Mac";
     }
 
-    if (/linux/i.test(ua + " " + platform)) {
+    if(value.includes("linux")){
         return "Linux";
     }
 
     return "Other";
 }
 
-function getMonth() {
-    const d = new Date();
+function getDay(){
+    const d=new Date();
 
-    return (
-        d.getUTCFullYear() +
-        "-" +
-        String(
-            d.getUTCMonth() + 1
-        ).padStart(2, "0")
-    );
+    return[
+        d.getUTCFullYear(),
+        String(d.getUTCMonth()+1).padStart(2,"0"),
+        String(d.getUTCDate()).padStart(2,"0")
+    ].join("-");
 }
 
-function getDateTime() {
-    const now = new Date();
-
+function getDateTime(){
     return new Intl.DateTimeFormat(
         "tr-TR",
         {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric",
+            hour:"2-digit",
+            minute:"2-digit",
+            second:"2-digit",
+            hour12:false
         }
-    ).format(now);
+    ).format(new Date());
 }
 
-async function getLocation() {
-    try {
-        const controller =
-            new AbortController();
+async function getNetwork(){
+    const controller=new AbortController();
 
-        const timeout =
-            setTimeout(
-                () => controller.abort(),
-                1000
-            );
+    const timeout=setTimeout(
+        ()=>controller.abort(),
+        1100
+    );
 
-        const response =
-            await fetch(
-                "https://api.country.is/?fields=city",
-                {
-                    signal:
-                        controller.signal
-                }
-            );
+    try{
+        const response=await fetch(
+            "https://ipsnapshot.com/api/ip/self",
+            {
+                signal:controller.signal,
+                cache:"no-store"
+            }
+        );
 
         clearTimeout(timeout);
 
-        const data =
-            await response.json();
+        if(!response.ok){
+            throw new Error();
+        }
 
-        return {
-            country:
-                data.country || "XX",
+        const result=await response.json();
+        const data=result.data||{};
 
-            city:
-                data.city || "Unknown"
+        let connection="Normal";
+
+        if(data.is_tor===true){
+            connection="Tor";
+        }else if(data.is_vpn===true){
+            connection="VPN";
+        }else if(data.is_datacenter===true){
+            connection="Hosting";
+        }
+
+        return{
+            country:data.country_code||"XX",
+            countryName:data.country||"Unknown",
+            city:data.city||"Unknown",
+            isp:data.isp||"Unknown",
+            connection:connection
         };
-    } catch {
-        return {
-            country: "XX",
-            city: "Unknown"
+    }catch{
+        clearTimeout(timeout);
+
+        return{
+            country:"XX",
+            countryName:"Unknown",
+            city:"Unknown",
+            isp:"Unknown",
+            connection:"Unknown"
         };
     }
 }
 
-async function saveVisit() {
-    const location =
-        await getLocation();
-
-    const system =
-        await getSystem();
-
-    const visit = {
-        timestamp: Date.now(),
-
-        datetime:
-            getDateTime(),
-
-        timezone:
-            Intl.DateTimeFormat()
-                .resolvedOptions()
-                .timeZone,
-
-        country:
-            location.country,
-
-        city:
-            location.city,
-
-        os:
-            system
-    };
-
-    const id =
-        crypto.randomUUID
-            ? crypto.randomUUID()
-            : (
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .slice(2)
-            );
-
-    const data = {};
-
-    data[id] = visit;
-
-    const endpoint =
-        `${DB}/visits/${getMonth()}`;
-
-    let response =
-        await fetch(
-            endpoint,
-            {
-                method: "PATCH",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:
-                    JSON.stringify(data),
-
-                keepalive: true
-            }
-        );
-
-    if (response.status === 404) {
-        await fetch(
-            endpoint,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
-
-                body:
-                    JSON.stringify(data),
-
-                keepalive: true
-            }
-        );
-    }
-}
-
-function wait(ms) {
-    return new Promise(
-        resolve =>
-            setTimeout(resolve, ms)
-    );
-}
-
-(async () => {
-    await Promise.race([
-        saveVisit(),
-        wait(1800)
+async function saveVisit(){
+    const [network,system]=await Promise.all([
+        getNetwork(),
+        getOS()
     ]);
 
-    await wait(150);
+    const visit={
+        timestamp:Date.now(),
+        datetime:getDateTime(),
+        country:network.country,
+        countryName:network.countryName,
+        city:network.city,
+        os:system,
+        isp:network.isp,
+        connection:network.connection
+    };
 
-    window.location.replace(
-        REDIRECT
+    const id=crypto.randomUUID
+        ?crypto.randomUUID()
+        :`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const data={};
+    data[id]=visit;
+
+    const endpoint=
+        `${DB}/visits/${getDay()}`;
+
+    let response=await fetch(
+        endpoint,
+        {
+            method:"PATCH",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify(data),
+            keepalive:true
+        }
     );
+
+    if(response.status===404){
+        await fetch(
+            endpoint,
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify(data),
+                keepalive:true
+            }
+        );
+    }
+
+    await fetch(
+        `https://mantledb.sh/v2/increment/${NAMESPACE}/stats`,
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                key:"total",
+                by:1
+            }),
+            keepalive:true
+        }
+    );
+}
+
+function wait(ms){
+    return new Promise(
+        resolve=>setTimeout(resolve,ms)
+    );
+}
+
+(async()=>{
+    const started=Date.now();
+
+    await Promise.race([
+        saveVisit(),
+        wait(5000)
+    ]);
+
+    const elapsed=Date.now()-started;
+
+    if(elapsed<5000){
+        await wait(5000-elapsed);
+    }
+
+    window.location.replace(REDIRECT);
 })();
 </script>
 
