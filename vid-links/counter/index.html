@@ -3,145 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Counter</title>
+<title>Visitors</title>
 
 <style>
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    background: #090909;
-    color: #f4f4f4;
-    font-family: Arial, Helvetica, sans-serif;
+body{
+    margin:0;
+    background:#090909;
+    color:#f5f5f5;
+    font-family:Arial,Helvetica,sans-serif;
 }
 
-main {
-    width: min(1000px, calc(100% - 32px));
-    margin: 50px auto;
+main{
+    width:min(1100px,calc(100% - 32px));
+    margin:48px auto;
 }
 
-.top {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    margin-bottom: 28px;
+header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:22px;
 }
 
-h1 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.5px;
+h1{
+    margin:0;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:-.4px;
 }
 
-.total {
-    font-size: 13px;
-    color: #777;
+.counter{
+    text-align:right;
+    color:#666;
+    font-size:11px;
 }
 
-.total strong {
-    display: block;
-    margin-top: 4px;
-    color: #fff;
-    font-size: 26px;
-    font-weight: 600;
+.counter strong{
+    display:block;
+    color:#fff;
+    font-size:25px;
+    font-weight:600;
+    margin-top:3px;
 }
 
-.panel {
-    border: 1px solid #1d1d1d;
-    border-radius: 14px;
-    overflow: hidden;
-    background: #0d0d0d;
+.panel{
+    overflow:hidden;
+    background:#0d0d0d;
+    border:1px solid #1d1d1d;
+    border-radius:12px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
+.scroll{
+    overflow-x:auto;
 }
 
-th {
-    padding: 14px 18px;
-    text-align: left;
-    color: #666;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: .6px;
-    border-bottom: 1px solid #1c1c1c;
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
 }
 
-td {
-    padding: 15px 18px;
-    font-size: 13px;
-    border-bottom: 1px solid #171717;
+th{
+    padding:13px 16px;
+    text-align:left;
+    color:#5f5f5f;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.5px;
+    border-bottom:1px solid #1d1d1d;
 }
 
-tbody tr:last-child td {
-    border-bottom: 0;
+td{
+    padding:14px 16px;
+    font-size:13px;
+    border-bottom:1px solid #171717;
 }
 
-.country {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+tbody tr:last-child td{
+    border-bottom:0;
 }
 
-.flag {
-    width: 24px;
-    height: 18px;
-    border-radius: 3px;
-    object-fit: cover;
+.country{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
-.name {
-    font-weight: 500;
+.flag{
+    width:26px;
+    height:19px;
+    object-fit:cover;
+    border-radius:3px;
+    background:#151515;
 }
 
-.code {
-    color: #666;
-    font-size: 10px;
-    margin-top: 2px;
+.country-name{
+    font-weight:500;
 }
 
-.city {
-    color: #aaa;
+.country-code{
+    margin-top:2px;
+    font-size:10px;
+    color:#555;
 }
 
-.os {
-    display: inline-block;
-    padding: 5px 9px;
-    background: #151515;
-    border: 1px solid #242424;
-    border-radius: 6px;
+.city{
+    color:#aaa;
 }
 
-.time {
-    color: #888;
+.system{
+    display:inline-block;
+    background:#151515;
+    border:1px solid #242424;
+    padding:5px 8px;
+    border-radius:6px;
 }
 
-.empty {
-    padding: 50px 20px;
-    text-align: center;
-    color: #555;
+.isp{
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#aaa;
 }
 
-@media (max-width: 650px) {
-    main {
-        margin-top: 25px;
-        width: calc(100% - 20px);
+.connection{
+    display:inline-block;
+    padding:5px 8px;
+    border-radius:6px;
+    border:1px solid #242424;
+    background:#151515;
+    font-size:11px;
+}
+
+.time{
+    color:#777;
+    white-space:nowrap;
+}
+
+.empty{
+    padding:50px 20px;
+    color:#555;
+    text-align:center;
+}
+
+@media(max-width:650px){
+    main{
+        width:calc(100% - 20px);
+        margin:25px auto;
     }
 
-    .panel {
-        overflow-x: auto;
-    }
-
-    table {
-        min-width: 650px;
-    }
-
-    .top {
-        padding: 0 5px;
+    h1{
+        font-size:20px;
     }
 }
 </style>
@@ -151,16 +169,17 @@ tbody tr:last-child td {
 
 <main>
 
-<div class="top">
+<header>
     <h1>Visitors</h1>
 
-    <div class="total">
+    <div class="counter">
         Total
         <strong id="total">0</strong>
     </div>
-</div>
+</header>
 
 <div class="panel">
+<div class="scroll">
 
 <table>
 
@@ -169,151 +188,175 @@ tbody tr:last-child td {
     <th>COUNTRY</th>
     <th>CITY</th>
     <th>SYSTEM</th>
+    <th>ISP</th>
+    <th>CONNECTION</th>
     <th>DATE / TIME</th>
 </tr>
 </thead>
 
 <tbody id="list">
 <tr>
-    <td colspan="4" class="empty">...</td>
+    <td colspan="6" class="empty">...</td>
 </tr>
 </tbody>
 
 </table>
 
 </div>
+</div>
 
 </main>
 
 <script>
-const NAMESPACE = "mete-x7k92m41-counter";
-const DB = `https://mantledb.sh/v2/${NAMESPACE}`;
+const NAMESPACE="mete-counter-x8k92m41a";
+const DB=`https://mantledb.sh/v2/${NAMESPACE}`;
 
-function months(amount = 6) {
-    const result = [];
-    const d = new Date();
+function getDays(amount=30){
+    const days=[];
+    const d=new Date();
 
-    d.setUTCDate(1);
+    for(let i=0;i<amount;i++){
+        days.push([
+            d.getUTCFullYear(),
+            String(d.getUTCMonth()+1).padStart(2,"0"),
+            String(d.getUTCDate()).padStart(2,"0")
+        ].join("-"));
 
-    for (let i = 0; i < amount; i++) {
-        result.push(
-            `${d.getUTCFullYear()}-${String(
-                d.getUTCMonth() + 1
-            ).padStart(2, "0")}`
-        );
-
-        d.setUTCMonth(
-            d.getUTCMonth() - 1
+        d.setUTCDate(
+            d.getUTCDate()-1
         );
     }
 
-    return result;
+    return days;
 }
 
-function countryName(code) {
-    if (!code || code === "XX") {
+function getCountryName(visit){
+    if(
+        visit.countryName &&
+        visit.countryName!=="Unknown"
+    ){
+        return visit.countryName;
+    }
+
+    if(
+        !visit.country ||
+        visit.country==="XX"
+    ){
         return "Unknown";
     }
 
-    try {
+    try{
         return new Intl.DisplayNames(
             ["tr"],
             {
-                type: "region"
+                type:"region"
             }
-        ).of(code);
-    } catch {
-        return code;
+        ).of(visit.country);
+    }catch{
+        return visit.country;
     }
 }
 
-function flag(code) {
-    const img = document.createElement("img");
+function createFlag(code){
+    const img=document.createElement("img");
 
-    img.className = "flag";
+    img.className="flag";
 
-    if (
+    if(
         !code ||
-        !/^[A-Z]{2}$/i.test(code) ||
-        code === "XX"
-    ) {
-        img.style.visibility = "hidden";
+        code==="XX" ||
+        !/^[A-Z]{2}$/i.test(code)
+    ){
+        img.style.visibility="hidden";
         return img;
     }
 
-    img.src =
-        `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
+    img.src=
+        `https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
 
-    img.alt = code;
+    img.alt=code;
 
-    img.onerror = () => {
-        img.style.visibility = "hidden";
+    img.onerror=()=>{
+        img.style.visibility="hidden";
     };
 
     return img;
 }
 
-async function total() {
-    try {
-        const r = await fetch(
-            `${DB}/stats`
+async function getTotal(){
+    try{
+        const response=await fetch(
+            `${DB}/stats`,
+            {
+                cache:"no-store"
+            }
         );
 
-        if (!r.ok) return 0;
+        if(!response.ok){
+            return null;
+        }
 
-        const data = await r.json();
+        const data=await response.json();
 
-        return Number(
-            data.total || 0
-        );
-    } catch {
-        return 0;
+        return Number(data.total||0);
+    }catch{
+        return null;
     }
 }
 
-async function load() {
-    const visits = [];
+async function load(){
+    const visits=[];
 
-    for (const month of months()) {
-        try {
-            const r = await fetch(
-                `${DB}/visits/${month}`
-            );
+    const requests=getDays(30).map(
+        async day=>{
+            try{
+                const response=await fetch(
+                    `${DB}/visits/${day}`,
+                    {
+                        cache:"no-store"
+                    }
+                );
 
-            if (!r.ok) continue;
+                if(!response.ok){
+                    return;
+                }
 
-            const data = await r.json();
+                const data=await response.json();
 
-            Object.values(data).forEach(
-                item => visits.push(item)
-            );
-        } catch {}
-    }
-
-    visits.sort(
-        (a, b) =>
-            (b.timestamp || 0) -
-            (a.timestamp || 0)
+                Object.values(data).forEach(
+                    visit=>visits.push(visit)
+                );
+            }catch{}
+        }
     );
 
-    document.getElementById("total").textContent =
-        await total();
+    await Promise.all(requests);
 
-    const list =
+    visits.sort(
+        (a,b)=>
+            (b.timestamp||0)-
+            (a.timestamp||0)
+    );
+
+    const savedTotal=await getTotal();
+
+    document.getElementById("total").textContent=
+        savedTotal===null
+            ?visits.length
+            :savedTotal;
+
+    const list=
         document.getElementById("list");
 
-    list.innerHTML = "";
+    list.innerHTML="";
 
-    if (!visits.length) {
-        const row =
-            document.createElement("tr");
+    if(!visits.length){
+        const row=document.createElement("tr");
+        const cell=document.createElement("td");
 
-        const cell =
-            document.createElement("td");
-
-        cell.colSpan = 4;
-        cell.className = "empty";
-        cell.textContent = "No visitors";
+        cell.colSpan=6;
+        cell.className="empty";
+        cell.textContent="No visitors";
 
         row.appendChild(cell);
         list.appendChild(row);
@@ -321,80 +364,111 @@ async function load() {
         return;
     }
 
-    visits.slice(0, 200).forEach(visit => {
-        const row =
-            document.createElement("tr");
+    visits.slice(0,300).forEach(
+        visit=>{
+            const row=
+                document.createElement("tr");
 
-        const countryCell =
-            document.createElement("td");
+            const countryCell=
+                document.createElement("td");
 
-        const country =
-            document.createElement("div");
+            const countryWrap=
+                document.createElement("div");
 
-        country.className =
-            "country";
+            countryWrap.className="country";
 
-        const text =
-            document.createElement("div");
+            const text=
+                document.createElement("div");
 
-        const name =
-            document.createElement("div");
+            const name=
+                document.createElement("div");
 
-        name.className = "name";
-        name.textContent =
-            countryName(visit.country);
+            name.className="country-name";
+            name.textContent=
+                getCountryName(visit);
 
-        const code =
-            document.createElement("div");
+            const code=
+                document.createElement("div");
 
-        code.className = "code";
-        code.textContent =
-            visit.country || "--";
+            code.className="country-code";
+            code.textContent=
+                visit.country||"--";
 
-        text.append(name, code);
+            text.append(name,code);
 
-        country.append(
-            flag(visit.country),
-            text
-        );
+            countryWrap.append(
+                createFlag(visit.country),
+                text
+            );
 
-        countryCell.appendChild(country);
+            countryCell.appendChild(
+                countryWrap
+            );
 
-        const city =
-            document.createElement("td");
+            const city=
+                document.createElement("td");
 
-        city.className = "city";
-        city.textContent =
-            visit.city || "Unknown";
+            city.className="city";
+            city.textContent=
+                visit.city||"Unknown";
 
-        const systemCell =
-            document.createElement("td");
+            const systemCell=
+                document.createElement("td");
 
-        const system =
-            document.createElement("span");
+            const system=
+                document.createElement("span");
 
-        system.className = "os";
-        system.textContent =
-            visit.os || "Other";
+            system.className="system";
+            system.textContent=
+                visit.os||"Other";
 
-        systemCell.appendChild(system);
+            systemCell.appendChild(system);
 
-        const time =
-            document.createElement("td");
+            const isp=
+                document.createElement("td");
 
-        time.className = "time";
-        time.textContent =
-            visit.datetime || "-";
+            isp.className="isp";
+            isp.textContent=
+                visit.isp||"Unknown";
 
-        row.append(
-            countryCell,
-            city,
-            systemCell,
-            time
-        );
+            isp.title=
+                visit.isp||"Unknown";
 
-        list.appendChild(row);
-    });
+            const connectionCell=
+                document.createElement("td");
+
+            const connection=
+                document.createElement("span");
+
+            connection.className=
+                "connection";
+
+            connection.textContent=
+                visit.connection||"Unknown";
+
+            connectionCell.appendChild(
+                connection
+            );
+
+            const time=
+                document.createElement("td");
+
+            time.className="time";
+            time.textContent=
+                visit.datetime||"-";
+
+            row.append(
+                countryCell,
+                city,
+                systemCell,
+                isp,
+                connectionCell,
+                time
+            );
+
+            list.appendChild(row);
+        }
+    );
 }
 
 load();
