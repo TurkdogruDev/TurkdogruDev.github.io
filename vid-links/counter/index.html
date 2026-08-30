@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
 <title>Visitors</title>
 
 <style>
@@ -10,29 +12,38 @@
     box-sizing:border-box;
 }
 
+html,
 body{
     margin:0;
+    min-height:100%;
     background:#090909;
     color:#f4f4f5;
-    font-family:Arial,Helvetica,sans-serif;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 
 main{
-    width:min(1100px,calc(100% - 32px));
+    width:min(1120px,calc(100% - 32px));
     margin:48px auto;
 }
 
 header{
     display:flex;
-    justify-content:space-between;
     align-items:flex-end;
-    margin-bottom:20px;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:18px;
 }
 
 h1{
     margin:0;
-    font-size:22px;
+    font-size:21px;
     font-weight:600;
+    letter-spacing:-.4px;
 }
 
 .total{
@@ -43,17 +54,17 @@ h1{
 
 .total strong{
     display:block;
-    margin-top:3px;
-    color:#fff;
-    font-size:26px;
+    margin-top:2px;
+    color:#fafafa;
+    font-size:25px;
     font-weight:600;
 }
 
 .panel{
-    background:#0d0d0d;
-    border:1px solid #1e1e1e;
-    border-radius:12px;
     overflow:hidden;
+    background:#0d0d0d;
+    border:1px solid #1d1d1d;
+    border-radius:12px;
 }
 
 .scroll{
@@ -62,24 +73,24 @@ h1{
 
 table{
     width:100%;
-    min-width:900px;
+    min-width:920px;
     border-collapse:collapse;
 }
 
 th{
-    padding:13px 16px;
-    color:#606060;
+    padding:13px 15px;
+    color:#5f5f5f;
+    border-bottom:1px solid #1d1d1d;
+    text-align:left;
     font-size:10px;
     font-weight:600;
-    text-align:left;
-    letter-spacing:.5px;
-    border-bottom:1px solid #1e1e1e;
+    letter-spacing:.55px;
 }
 
 td{
-    padding:14px 16px;
-    font-size:13px;
+    padding:14px 15px;
     border-bottom:1px solid #171717;
+    font-size:13px;
 }
 
 tbody tr:last-child td{
@@ -95,15 +106,17 @@ tbody tr:last-child td{
 .flag{
     width:27px;
     height:20px;
+    flex:none;
     object-fit:cover;
     border-radius:3px;
+    background:#151515;
 }
 
-.country-name{
+.countryName{
     font-weight:500;
 }
 
-.country-code{
+.countryCode{
     margin-top:2px;
     color:#555;
     font-size:10px;
@@ -118,17 +131,32 @@ tbody tr:last-child td{
 .isp{
     max-width:220px;
     overflow:hidden;
-    white-space:nowrap;
     text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
-.tag{
-    display:inline-block;
-    padding:5px 8px;
+.badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:26px;
+    padding:4px 8px;
     background:#151515;
     border:1px solid #242424;
     border-radius:6px;
+    white-space:nowrap;
     font-size:11px;
+}
+
+.vpn{
+    border-color:#403326;
+}
+
+.hosting{
+    border-color:#32323e;
+}
+
+.normal{
+    border-color:#24342a;
 }
 
 .time{
@@ -136,7 +164,7 @@ tbody tr:last-child td{
 }
 
 .empty{
-    padding:50px 20px;
+    padding:55px 20px;
     color:#555;
     text-align:center;
 }
@@ -144,7 +172,15 @@ tbody tr:last-child td{
 @media(max-width:650px){
     main{
         width:calc(100% - 20px);
-        margin:25px auto;
+        margin:26px auto;
+    }
+
+    h1{
+        font-size:19px;
+    }
+
+    .total strong{
+        font-size:22px;
     }
 }
 </style>
@@ -155,73 +191,89 @@ tbody tr:last-child td{
 <main>
 
 <header>
-    <h1>Visitors</h1>
 
-    <div class="total">
-        Total
-        <strong id="total">0</strong>
-    </div>
+<h1>Visitors</h1>
+
+<div class="total">
+Total
+<strong id="total">0</strong>
+</div>
+
 </header>
 
 <div class="panel">
+
 <div class="scroll">
 
 <table>
+
 <thead>
 <tr>
-    <th>COUNTRY</th>
-    <th>CITY</th>
-    <th>SYSTEM</th>
-    <th>ISP</th>
-    <th>CONNECTION</th>
-    <th>DATE / TIME</th>
+<th>COUNTRY</th>
+<th>CITY</th>
+<th>SYSTEM</th>
+<th>ISP</th>
+<th>CONNECTION</th>
+<th>DATE / TIME</th>
 </tr>
 </thead>
 
 <tbody id="list">
 <tr>
-    <td colspan="6" class="empty">...</td>
+<td
+    colspan="6"
+    class="empty"
+>
+...
+</td>
 </tr>
 </tbody>
+
 </table>
 
 </div>
+
 </div>
 
 </main>
 
 <script>
-const NAMESPACE="mete-counter-x8k92m412";
-const DB=`https://mantledb.sh/v2/${NAMESPACE}`;
+const NAMESPACE=
+    "mete-counter-x8k92m412";
+
+const DB=
+    `https://mantledb.sh/v2/${NAMESPACE}`;
 
 function getDays(amount=30){
     const days=[];
     const d=new Date();
 
     for(let i=0;i<amount;i++){
-        days.push([
-            d.getUTCFullYear(),
-            String(d.getUTCMonth()+1).padStart(2,"0"),
-            String(d.getUTCDate()).padStart(2,"0")
-        ].join("-"));
 
-        d.setUTCDate(d.getUTCDate()-1);
+        days.push(
+            [
+                d.getUTCFullYear(),
+                String(
+                    d.getUTCMonth()+1
+                ).padStart(2,"0"),
+                String(
+                    d.getUTCDate()
+                ).padStart(2,"0")
+            ].join("-")
+        );
+
+        d.setUTCDate(
+            d.getUTCDate()-1
+        );
     }
 
     return days;
 }
 
-function getCountryName(visit){
+function getCountryName(code){
     if(
-        visit.countryName &&
-        visit.countryName!=="Unknown"
-    ){
-        return visit.countryName;
-    }
-
-    if(
-        !visit.country ||
-        visit.country==="XX"
+        !code ||
+        code==="XX"
     ){
         return "Unknown";
     }
@@ -229,15 +281,19 @@ function getCountryName(visit){
     try{
         return new Intl.DisplayNames(
             ["tr"],
-            {type:"region"}
-        ).of(visit.country);
-    }catch{
-        return visit.country;
+            {
+                type:"region"
+            }
+        ).of(code);
+    }
+    catch{
+        return code;
     }
 }
 
 function createFlag(code){
-    const img=document.createElement("img");
+    const img=
+        document.createElement("img");
 
     img.className="flag";
 
@@ -246,89 +302,182 @@ function createFlag(code){
         code==="XX" ||
         !/^[A-Z]{2}$/i.test(code)
     ){
-        img.style.visibility="hidden";
+        img.style.visibility=
+            "hidden";
+
         return img;
     }
 
-    img.src=`https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
+    img.src=
+        `https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
+
     img.alt=code;
 
     img.onerror=()=>{
-        img.style.visibility="hidden";
+        img.style.visibility=
+            "hidden";
     };
 
     return img;
 }
 
+function createBadge(
+    value,
+    extra=""
+){
+    const badge=
+        document.createElement("span");
+
+    badge.className=
+        `badge ${extra}`;
+
+    badge.textContent=
+        value||"Unknown";
+
+    return badge;
+}
+
+function connectionClass(value){
+    const v=
+        String(value||"")
+            .toLowerCase();
+
+    if(v==="vpn"){
+        return "vpn";
+    }
+
+    if(v==="hosting"){
+        return "hosting";
+    }
+
+    if(v==="normal"){
+        return "normal";
+    }
+
+    return "";
+}
+
 async function getTotal(){
     try{
-        const response=await fetch(
-            `${DB}/stats`,
-            {cache:"no-store"}
-        );
+        const response=
+            await fetch(
+                `${DB}/stats`,
+                {
+                    cache:"no-store"
+                }
+            );
 
         if(!response.ok){
             return null;
         }
 
-        const data=await response.json();
+        const data=
+            await response.json();
 
-        return Number(data.total||0);
-    }catch{
+        return Number(
+            data.total||0
+        );
+    }
+    catch{
         return null;
     }
 }
 
-async function load(){
+async function getVisits(){
     const visits=[];
 
-    await Promise.all(
+    const requests=
         getDays(30).map(
             async day=>{
                 try{
-                    const response=await fetch(
-                        `${DB}/visits/${day}`,
-                        {cache:"no-store"}
-                    );
+                    const response=
+                        await fetch(
+                            `${DB}/visits/${day}`,
+                            {
+                                cache:"no-store"
+                            }
+                        );
 
                     if(!response.ok){
                         return;
                     }
 
-                    const data=await response.json();
+                    const data=
+                        await response.json();
 
-                    Object.values(data).forEach(
-                        visit=>visits.push(visit)
-                    );
-                }catch{}
+                    if(
+                        !data ||
+                        typeof data!=="object"
+                    ){
+                        return;
+                    }
+
+                    Object
+                        .values(data)
+                        .forEach(
+                            visit=>{
+                                if(
+                                    visit &&
+                                    typeof visit==="object"
+                                ){
+                                    visits.push(
+                                        visit
+                                    );
+                                }
+                            }
+                        );
+                }
+                catch{}
             }
-        )
+        );
+
+    await Promise.all(
+        requests
     );
 
     visits.sort(
         (a,b)=>
-            (b.timestamp||0)-
-            (a.timestamp||0)
+            Number(b.timestamp||0)-
+            Number(a.timestamp||0)
     );
 
-    const savedTotal=await getTotal();
+    return visits;
+}
 
-    document.getElementById("total").textContent=
-        savedTotal===null
-            ?visits.length
-            :savedTotal;
+async function load(){
+    const [
+        visits,
+        savedTotal
+    ]=await Promise.all([
+        getVisits(),
+        getTotal()
+    ]);
 
-    const list=document.getElementById("list");
+    document
+        .getElementById("total")
+        .textContent=
+            savedTotal===null
+                ?visits.length
+                :savedTotal;
+
+    const list=
+        document.getElementById(
+            "list"
+        );
 
     list.innerHTML="";
 
     if(!visits.length){
-        const row=document.createElement("tr");
-        const cell=document.createElement("td");
+        const row=
+            document.createElement("tr");
+
+        const cell=
+            document.createElement("td");
 
         cell.colSpan=6;
         cell.className="empty";
-        cell.textContent="No visitors";
+        cell.textContent=
+            "No visitors";
 
         row.appendChild(cell);
         list.appendChild(row);
@@ -336,82 +485,139 @@ async function load(){
         return;
     }
 
-    visits.slice(0,300).forEach(visit=>{
-        const row=document.createElement("tr");
+    visits
+        .slice(0,300)
+        .forEach(
+            visit=>{
+                const row=
+                    document.createElement("tr");
 
-        const countryCell=document.createElement("td");
-        const countryWrap=document.createElement("div");
-        const countryText=document.createElement("div");
-        const countryName=document.createElement("div");
-        const countryCode=document.createElement("div");
+                const countryCell=
+                    document.createElement("td");
 
-        countryWrap.className="country";
-        countryName.className="country-name";
-        countryCode.className="country-code";
+                const country=
+                    document.createElement("div");
 
-        countryName.textContent=getCountryName(visit);
-        countryCode.textContent=visit.country||"--";
+                country.className=
+                    "country";
 
-        countryText.append(
-            countryName,
-            countryCode
+                const text=
+                    document.createElement("div");
+
+                const name=
+                    document.createElement("div");
+
+                name.className=
+                    "countryName";
+
+                name.textContent=
+                    getCountryName(
+                        visit.country
+                    );
+
+                const code=
+                    document.createElement("div");
+
+                code.className=
+                    "countryCode";
+
+                code.textContent=
+                    visit.country||
+                    "--";
+
+                text.append(
+                    name,
+                    code
+                );
+
+                country.append(
+                    createFlag(
+                        visit.country
+                    ),
+                    text
+                );
+
+                countryCell
+                    .appendChild(
+                        country
+                    );
+
+                const city=
+                    document.createElement("td");
+
+                city.className="city";
+
+                city.textContent=
+                    visit.city||
+                    "Unknown";
+
+                const systemCell=
+                    document.createElement("td");
+
+                systemCell.appendChild(
+                    createBadge(
+                        visit.os||
+                        "Other"
+                    )
+                );
+
+                const isp=
+                    document.createElement("td");
+
+                isp.className="isp";
+
+                isp.textContent=
+                    visit.isp||
+                    "Unknown";
+
+                isp.title=
+                    visit.isp||
+                    "Unknown";
+
+                const connectionCell=
+                    document.createElement("td");
+
+                connectionCell.appendChild(
+                    createBadge(
+                        visit.connection||
+                        "Unknown",
+                        connectionClass(
+                            visit.connection
+                        )
+                    )
+                );
+
+                const time=
+                    document.createElement("td");
+
+                time.className="time";
+
+                time.textContent=
+                    visit.datetime||
+                    "-";
+
+                row.append(
+                    countryCell,
+                    city,
+                    systemCell,
+                    isp,
+                    connectionCell,
+                    time
+                );
+
+                list.appendChild(
+                    row
+                );
+            }
         );
-
-        countryWrap.append(
-            createFlag(visit.country),
-            countryText
-        );
-
-        countryCell.appendChild(countryWrap);
-
-        const city=document.createElement("td");
-
-        city.className="city";
-        city.textContent=visit.city||"Unknown";
-
-        const systemCell=document.createElement("td");
-        const system=document.createElement("span");
-
-        system.className="tag";
-        system.textContent=visit.os||"Other";
-
-        systemCell.appendChild(system);
-
-        const isp=document.createElement("td");
-
-        isp.className="isp";
-        isp.textContent=visit.isp||"Unknown";
-        isp.title=visit.isp||"Unknown";
-
-        const connectionCell=document.createElement("td");
-        const connection=document.createElement("span");
-
-        connection.className="tag";
-        connection.textContent=visit.connection||"Unknown";
-
-        connectionCell.appendChild(connection);
-
-        const time=document.createElement("td");
-
-        time.className="time";
-        time.textContent=visit.datetime||"-";
-
-        row.append(
-            countryCell,
-            city,
-            systemCell,
-            isp,
-            connectionCell,
-            time
-        );
-
-        list.appendChild(row);
-    });
 }
 
 load();
 
-setInterval(load,5000);
+setInterval(
+    load,
+    5000
+);
 </script>
 
 </body>
