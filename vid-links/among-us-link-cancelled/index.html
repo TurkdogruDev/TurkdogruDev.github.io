@@ -2,8 +2,9 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090909">
+<meta name="color-scheme" content="dark">
 <title>T.Dev</title>
 
 <style>
@@ -22,6 +23,7 @@ body{
 }
 
 body{
+    min-height:100vh;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -35,16 +37,20 @@ body{
 }
 
 .icon{
-    width:42px;
-    height:42px;
+    width:46px;
+    height:46px;
     margin:0 auto 18px;
     display:flex;
     align-items:center;
     justify-content:center;
-    border:1px solid #2a2a2a;
+    border:1px solid #5a2020;
     border-radius:50%;
-    color:#888;
-    font-size:20px;
+    background:#1a0d0d;
+    color:#ff4d4d;
+    font-size:27px;
+    font-weight:400;
+    line-height:1;
+    box-shadow:0 0 0 4px rgba(255,77,77,.03);
 }
 
 h1{
@@ -67,6 +73,24 @@ small{
     color:#555;
     font-size:12px;
 }
+
+@media(max-width:480px){
+    body{
+        padding:18px;
+    }
+
+    .box{
+        max-width:350px;
+    }
+
+    h1{
+        font-size:19px;
+    }
+
+    p{
+        font-size:13px;
+    }
+}
 </style>
 </head>
 
@@ -84,7 +108,7 @@ proje bağlantısına yönlendirme yapılmadı.
 </p>
 
 <small>
-Bu sekmeyi güvenle kapatabilirsiniz.
+Herhangi bir ziyaret verisi kaydedilmedi.
 </small>
 
 </div>
