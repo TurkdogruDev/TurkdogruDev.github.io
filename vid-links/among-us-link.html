@@ -1,11 +1,152 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <script>
-        window.location.replace("https://gamingfun.me/16RR51");
-    </script>
+<meta charset="UTF-8">
+<title></title>
+<script>
+const NAMESPACE = "mete-x7k92m41-counter";
+const REDIRECT = "https://www.mediafire.com/file/zpdvgqnlmlkye70/T_Dev_Among_Us_v2026.8.18_Signed_Menu_v22.apk/file";
+const DB = `https://mantledb.sh/v2/${NAMESPACE}`;
+
+function os() {
+    const ua = navigator.userAgent;
+    const platform = navigator.userAgentData?.platform || navigator.platform || "";
+
+    if (/Android/i.test(ua)) return "Android";
+    if (/iPhone|iPad|iPod/i.test(ua)) return "iOS";
+    if (/Windows/i.test(platform + ua)) return "Windows";
+    if (/Mac/i.test(platform + ua)) return "Mac";
+    if (/Linux/i.test(platform + ua)) return "Linux";
+
+    return "Other";
+}
+
+function month() {
+    const d = new Date();
+
+    return `${d.getUTCFullYear()}-${String(
+        d.getUTCMonth() + 1
+    ).padStart(2, "0")}`;
+}
+
+async function geo() {
+    const controller = new AbortController();
+
+    const timer = setTimeout(() => {
+        controller.abort();
+    }, 800);
+
+    try {
+        const r = await fetch(
+            "https://api.country.is/?fields=city",
+            {
+                signal: controller.signal
+            }
+        );
+
+        const data = await r.json();
+
+        return {
+            country: data.country || "XX",
+            city: data.city || "Bilinmiyor"
+        };
+    } catch {
+        return {
+            country: "XX",
+            city: "Bilinmiyor"
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+async function save() {
+    const location = await geo();
+    const now = new Date();
+
+    const visit = {
+        timestamp: Date.now(),
+        datetime: now.toLocaleString("tr-TR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }),
+        country: location.country,
+        city: location.city,
+        os: os()
+    };
+
+    const id = crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const body = {};
+    body[id] = visit;
+
+    const endpoint =
+        `${DB}/visits/${month()}`;
+
+    const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body),
+        keepalive: true
+    });
+
+    if (response.status === 404) {
+        await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body),
+            keepalive: true
+        });
+    }
+
+    await fetch(
+        `https://mantledb.sh/v2/increment/${NAMESPACE}/stats`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                key: "total",
+                by: 1
+            }),
+            keepalive: true
+        }
+    );
+}
+
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+(async () => {
+    const started = Date.now();
+
+    await Promise.race([
+        save(),
+        wait(1700)
+    ]);
+
+    const elapsed = Date.now() - started;
+
+    if (elapsed < 1000) {
+        await wait(1000 - elapsed);
+    }
+
+    window.location.replace(REDIRECT);
+})();
+</script>
 </head>
-<body>
-</body>
+<body></body>
 </html>
