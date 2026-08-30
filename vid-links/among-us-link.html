@@ -186,6 +186,9 @@ const NAMESPACE="mete-counter-x8k92m413";
 const REDIRECT=
 "https://www.mediafire.com/file/zpdvgqnlmlkye70/T_Dev_Among_Us_v2026.8.18_Signed_Menu_v22.apk/file";
 
+const CANCEL_URL=
+"https://turkdogru.dev.tc/vid-links/among-us-link-canceled/";
+
 const DB=
 `https://mantledb.sh/v2/${NAMESPACE}`;
 
@@ -251,12 +254,8 @@ function getDay(){
 
     return[
         d.getUTCFullYear(),
-        String(
-            d.getUTCMonth()+1
-        ).padStart(2,"0"),
-        String(
-            d.getUTCDate()
-        ).padStart(2,"0")
+        String(d.getUTCMonth()+1).padStart(2,"0"),
+        String(d.getUTCDate()).padStart(2,"0")
     ].join("-");
 }
 
@@ -331,8 +330,7 @@ async function getNetwork(){
     let connection="Unknown";
 
     if(
-        results[0].status===
-        "fulfilled"
+        results[0].status==="fulfilled"
     ){
         const geo=
             results[0].value||{};
@@ -362,8 +360,7 @@ async function getNetwork(){
     }
 
     if(
-        results[1].status===
-        "fulfilled"
+        results[1].status==="fulfilled"
     ){
         const privacy=
             results[1].value
@@ -377,14 +374,12 @@ async function getNetwork(){
             connection="VPN";
         }
         else if(
-            privacy.is_datacenter===
-            true
+            privacy.is_datacenter===true
         ){
             connection="Hosting";
         }
         else if(
-            privacy.is_residential===
-            true
+            privacy.is_residential===true
         ){
             connection="Normal";
         }
@@ -408,14 +403,12 @@ async function saveVisit(){
         timestamp:Date.now(),
         datetime:getDateTime(),
         country:network.country,
-        countryName:
-            network.countryName,
+        countryName:network.countryName,
         city:network.city,
         os:getOS(),
         isp:network.isp,
         flag:network.flag,
-        connection:
-            network.connection
+        connection:network.connection
     };
 
     const id=
@@ -537,15 +530,13 @@ const countdown=
 cancel.addEventListener(
     "click",
     ()=>{
-        if(
-            document.referrer
-        ){
-            history.back();
-        }
-        else{
-            window.location.href=
-                "about:blank";
-        }
+        clearInterval(
+            countdown
+        );
+
+        window.location.replace(
+            CANCEL_URL
+        );
     }
 );
 
@@ -559,7 +550,6 @@ accept.addEventListener(
         }
 
         accept.disabled=true;
-
         cancel.disabled=true;
 
         accept.classList.add(
