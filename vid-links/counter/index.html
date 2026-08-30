@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Counter</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #090909;
+    color: #f4f4f4;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+main {
+    width: min(1000px, calc(100% - 32px));
+    margin: 50px auto;
+}
+
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 28px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.total {
+    font-size: 13px;
+    color: #777;
+}
+
+.total strong {
+    display: block;
+    margin-top: 4px;
+    color: #fff;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.panel {
+    border: 1px solid #1d1d1d;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #0d0d0d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 14px 18px;
+    text-align: left;
+    color: #666;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .6px;
+    border-bottom: 1px solid #1c1c1c;
+}
+
+td {
+    padding: 15px 18px;
+    font-size: 13px;
+    border-bottom: 1px solid #171717;
+}
+
+tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.country {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.flag {
+    width: 24px;
+    height: 18px;
+    border-radius: 3px;
+    object-fit: cover;
+}
+
+.name {
+    font-weight: 500;
+}
+
+.code {
+    color: #666;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.city {
+    color: #aaa;
+}
+
+.os {
+    display: inline-block;
+    padding: 5px 9px;
+    background: #151515;
+    border: 1px solid #242424;
+    border-radius: 6px;
+}
+
+.time {
+    color: #888;
+}
+
+.empty {
+    padding: 50px 20px;
+    text-align: center;
+    color: #555;
+}
+
+@media (max-width: 650px) {
+    main {
+        margin-top: 25px;
+        width: calc(100% - 20px);
+    }
+
+    .panel {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 650px;
+    }
+
+    .top {
+        padding: 0 5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main>
+
+<div class="top">
+    <h1>Visitors</h1>
+
+    <div class="total">
+        Total
+        <strong id="total">0</strong>
+    </div>
+</div>
+
+<div class="panel">
+
+<table>
+
+<thead>
+<tr>
+    <th>COUNTRY</th>
+    <th>CITY</th>
+    <th>SYSTEM</th>
+    <th>DATE / TIME</th>
+</tr>
+</thead>
+
+<tbody id="list">
+<tr>
+    <td colspan="4" class="empty">...</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</main>
+
+<script>
+const NAMESPACE = "mete-x7k92m41-counter";
+const DB = `https://mantledb.sh/v2/${NAMESPACE}`;
+
+function months(amount = 6) {
+    const result = [];
+    const d = new Date();
+
+    d.setUTCDate(1);
+
+    for (let i = 0; i < amount; i++) {
+        result.push(
+            `${d.getUTCFullYear()}-${String(
+                d.getUTCMonth() + 1
+            ).padStart(2, "0")}`
+        );
+
+        d.setUTCMonth(
+            d.getUTCMonth() - 1
+        );
+    }
+
+    return result;
+}
+
+function countryName(code) {
+    if (!code || code === "XX") {
+        return "Unknown";
+    }
+
+    try {
+        return new Intl.DisplayNames(
+            ["tr"],
+            {
+                type: "region"
+            }
+        ).of(code);
+    } catch {
+        return code;
+    }
+}
+
+function flag(code) {
+    const img = document.createElement("img");
+
+    img.className = "flag";
+
+    if (
+        !code ||
+        !/^[A-Z]{2}$/i.test(code) ||
+        code === "XX"
+    ) {
+        img.style.visibility = "hidden";
+        return img;
+    }
+
+    img.src =
+        `https://flagcdn.com/24x18/${code.toLowerCase()}.png`;
+
+    img.alt = code;
+
+    img.onerror = () => {
+        img.style.visibility = "hidden";
+    };
+
+    return img;
+}
+
+async function total() {
+    try {
+        const r = await fetch(
+            `${DB}/stats`
+        );
+
+        if (!r.ok) return 0;
+
+        const data = await r.json();
+
+        return Number(
+            data.total || 0
+        );
+    } catch {
+        return 0;
+    }
+}
+
+async function load() {
+    const visits = [];
+
+    for (const month of months()) {
+        try {
+            const r = await fetch(
+                `${DB}/visits/${month}`
+            );
+
+            if (!r.ok) continue;
+
+            const data = await r.json();
+
+            Object.values(data).forEach(
+                item => visits.push(item)
+            );
+        } catch {}
+    }
+
+    visits.sort(
+        (a, b) =>
+            (b.timestamp || 0) -
+            (a.timestamp || 0)
+    );
+
+    document.getElementById("total").textContent =
+        await total();
+
+    const list =
+        document.getElementById("list");
+
+    list.innerHTML = "";
+
+    if (!visits.length) {
+        const row =
+            document.createElement("tr");
+
+        const cell =
+            document.createElement("td");
+
+        cell.colSpan = 4;
+        cell.className = "empty";
+        cell.textContent = "No visitors";
+
+        row.appendChild(cell);
+        list.appendChild(row);
+
+        return;
+    }
+
+    visits.slice(0, 200).forEach(visit => {
+        const row =
+            document.createElement("tr");
+
+        const countryCell =
+            document.createElement("td");
+
+        const country =
+            document.createElement("div");
+
+        country.className =
+            "country";
+
+        const text =
+            document.createElement("div");
+
+        const name =
+            document.createElement("div");
+
+        name.className = "name";
+        name.textContent =
+            countryName(visit.country);
+
+        const code =
+            document.createElement("div");
+
+        code.className = "code";
+        code.textContent =
+            visit.country || "--";
+
+        text.append(name, code);
+
+        country.append(
+            flag(visit.country),
+            text
+        );
+
+        countryCell.appendChild(country);
+
+        const city =
+            document.createElement("td");
+
+        city.className = "city";
+        city.textContent =
+            visit.city || "Unknown";
+
+        const systemCell =
+            document.createElement("td");
+
+        const system =
+            document.createElement("span");
+
+        system.className = "os";
+        system.textContent =
+            visit.os || "Other";
+
+        systemCell.appendChild(system);
+
+        const time =
+            document.createElement("td");
+
+        time.className = "time";
+        time.textContent =
+            visit.datetime || "-";
+
+        row.append(
+            countryCell,
+            city,
+            systemCell,
+            time
+        );
+
+        list.appendChild(row);
+    });
+}
+
+load();
+
+setInterval(
+    load,
+    10000
+);
+</script>
+
+</body>
+</html>
