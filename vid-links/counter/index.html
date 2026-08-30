@@ -13,7 +13,7 @@
 body{
     margin:0;
     background:#090909;
-    color:#f5f5f5;
+    color:#f4f4f5;
     font-family:Arial,Helvetica,sans-serif;
 }
 
@@ -24,38 +24,36 @@ main{
 
 header{
     display:flex;
-    align-items:flex-end;
     justify-content:space-between;
-    gap:20px;
-    margin-bottom:22px;
+    align-items:flex-end;
+    margin-bottom:20px;
 }
 
 h1{
     margin:0;
     font-size:22px;
     font-weight:600;
-    letter-spacing:-.4px;
 }
 
-.counter{
-    text-align:right;
+.total{
     color:#666;
     font-size:11px;
+    text-align:right;
 }
 
-.counter strong{
+.total strong{
     display:block;
-    color:#fff;
-    font-size:25px;
-    font-weight:600;
     margin-top:3px;
+    color:#fff;
+    font-size:26px;
+    font-weight:600;
 }
 
 .panel{
-    overflow:hidden;
     background:#0d0d0d;
-    border:1px solid #1d1d1d;
+    border:1px solid #1e1e1e;
     border-radius:12px;
+    overflow:hidden;
 }
 
 .scroll{
@@ -64,18 +62,18 @@ h1{
 
 table{
     width:100%;
+    min-width:900px;
     border-collapse:collapse;
-    min-width:850px;
 }
 
 th{
     padding:13px 16px;
-    text-align:left;
-    color:#5f5f5f;
+    color:#606060;
     font-size:10px;
     font-weight:600;
+    text-align:left;
     letter-spacing:.5px;
-    border-bottom:1px solid #1d1d1d;
+    border-bottom:1px solid #1e1e1e;
 }
 
 td{
@@ -95,11 +93,10 @@ tbody tr:last-child td{
 }
 
 .flag{
-    width:26px;
-    height:19px;
+    width:27px;
+    height:20px;
     object-fit:cover;
     border-radius:3px;
-    background:#151515;
 }
 
 .country-name{
@@ -108,41 +105,33 @@ tbody tr:last-child td{
 
 .country-code{
     margin-top:2px;
-    font-size:10px;
     color:#555;
+    font-size:10px;
 }
 
-.city{
-    color:#aaa;
-}
-
-.system{
-    display:inline-block;
-    background:#151515;
-    border:1px solid #242424;
-    padding:5px 8px;
-    border-radius:6px;
+.city,
+.isp,
+.time{
+    color:#999;
 }
 
 .isp{
     max-width:220px;
     overflow:hidden;
-    text-overflow:ellipsis;
     white-space:nowrap;
-    color:#aaa;
+    text-overflow:ellipsis;
 }
 
-.connection{
+.tag{
     display:inline-block;
     padding:5px 8px;
-    border-radius:6px;
-    border:1px solid #242424;
     background:#151515;
+    border:1px solid #242424;
+    border-radius:6px;
     font-size:11px;
 }
 
 .time{
-    color:#777;
     white-space:nowrap;
 }
 
@@ -157,10 +146,6 @@ tbody tr:last-child td{
         width:calc(100% - 20px);
         margin:25px auto;
     }
-
-    h1{
-        font-size:20px;
-    }
 }
 </style>
 </head>
@@ -172,7 +157,7 @@ tbody tr:last-child td{
 <header>
     <h1>Visitors</h1>
 
-    <div class="counter">
+    <div class="total">
         Total
         <strong id="total">0</strong>
     </div>
@@ -182,7 +167,6 @@ tbody tr:last-child td{
 <div class="scroll">
 
 <table>
-
 <thead>
 <tr>
     <th>COUNTRY</th>
@@ -199,7 +183,6 @@ tbody tr:last-child td{
     <td colspan="6" class="empty">...</td>
 </tr>
 </tbody>
-
 </table>
 
 </div>
@@ -208,7 +191,7 @@ tbody tr:last-child td{
 </main>
 
 <script>
-const NAMESPACE="mete-counter-x8k92m41a";
+const NAMESPACE="mete-counter-x8k92m412";
 const DB=`https://mantledb.sh/v2/${NAMESPACE}`;
 
 function getDays(amount=30){
@@ -222,9 +205,7 @@ function getDays(amount=30){
             String(d.getUTCDate()).padStart(2,"0")
         ].join("-"));
 
-        d.setUTCDate(
-            d.getUTCDate()-1
-        );
+        d.setUTCDate(d.getUTCDate()-1);
     }
 
     return days;
@@ -248,9 +229,7 @@ function getCountryName(visit){
     try{
         return new Intl.DisplayNames(
             ["tr"],
-            {
-                type:"region"
-            }
+            {type:"region"}
         ).of(visit.country);
     }catch{
         return visit.country;
@@ -271,9 +250,7 @@ function createFlag(code){
         return img;
     }
 
-    img.src=
-        `https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
-
+    img.src=`https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
     img.alt=code;
 
     img.onerror=()=>{
@@ -287,9 +264,7 @@ async function getTotal(){
     try{
         const response=await fetch(
             `${DB}/stats`,
-            {
-                cache:"no-store"
-            }
+            {cache:"no-store"}
         );
 
         if(!response.ok){
@@ -307,30 +282,28 @@ async function getTotal(){
 async function load(){
     const visits=[];
 
-    const requests=getDays(30).map(
-        async day=>{
-            try{
-                const response=await fetch(
-                    `${DB}/visits/${day}`,
-                    {
-                        cache:"no-store"
+    await Promise.all(
+        getDays(30).map(
+            async day=>{
+                try{
+                    const response=await fetch(
+                        `${DB}/visits/${day}`,
+                        {cache:"no-store"}
+                    );
+
+                    if(!response.ok){
+                        return;
                     }
-                );
 
-                if(!response.ok){
-                    return;
-                }
+                    const data=await response.json();
 
-                const data=await response.json();
-
-                Object.values(data).forEach(
-                    visit=>visits.push(visit)
-                );
-            }catch{}
-        }
+                    Object.values(data).forEach(
+                        visit=>visits.push(visit)
+                    );
+                }catch{}
+            }
+        )
     );
-
-    await Promise.all(requests);
 
     visits.sort(
         (a,b)=>
@@ -345,8 +318,7 @@ async function load(){
             ?visits.length
             :savedTotal;
 
-    const list=
-        document.getElementById("list");
+    const list=document.getElementById("list");
 
     list.innerHTML="";
 
@@ -364,119 +336,82 @@ async function load(){
         return;
     }
 
-    visits.slice(0,300).forEach(
-        visit=>{
-            const row=
-                document.createElement("tr");
+    visits.slice(0,300).forEach(visit=>{
+        const row=document.createElement("tr");
 
-            const countryCell=
-                document.createElement("td");
+        const countryCell=document.createElement("td");
+        const countryWrap=document.createElement("div");
+        const countryText=document.createElement("div");
+        const countryName=document.createElement("div");
+        const countryCode=document.createElement("div");
 
-            const countryWrap=
-                document.createElement("div");
+        countryWrap.className="country";
+        countryName.className="country-name";
+        countryCode.className="country-code";
 
-            countryWrap.className="country";
+        countryName.textContent=getCountryName(visit);
+        countryCode.textContent=visit.country||"--";
 
-            const text=
-                document.createElement("div");
+        countryText.append(
+            countryName,
+            countryCode
+        );
 
-            const name=
-                document.createElement("div");
+        countryWrap.append(
+            createFlag(visit.country),
+            countryText
+        );
 
-            name.className="country-name";
-            name.textContent=
-                getCountryName(visit);
+        countryCell.appendChild(countryWrap);
 
-            const code=
-                document.createElement("div");
+        const city=document.createElement("td");
 
-            code.className="country-code";
-            code.textContent=
-                visit.country||"--";
+        city.className="city";
+        city.textContent=visit.city||"Unknown";
 
-            text.append(name,code);
+        const systemCell=document.createElement("td");
+        const system=document.createElement("span");
 
-            countryWrap.append(
-                createFlag(visit.country),
-                text
-            );
+        system.className="tag";
+        system.textContent=visit.os||"Other";
 
-            countryCell.appendChild(
-                countryWrap
-            );
+        systemCell.appendChild(system);
 
-            const city=
-                document.createElement("td");
+        const isp=document.createElement("td");
 
-            city.className="city";
-            city.textContent=
-                visit.city||"Unknown";
+        isp.className="isp";
+        isp.textContent=visit.isp||"Unknown";
+        isp.title=visit.isp||"Unknown";
 
-            const systemCell=
-                document.createElement("td");
+        const connectionCell=document.createElement("td");
+        const connection=document.createElement("span");
 
-            const system=
-                document.createElement("span");
+        connection.className="tag";
+        connection.textContent=visit.connection||"Unknown";
 
-            system.className="system";
-            system.textContent=
-                visit.os||"Other";
+        connectionCell.appendChild(connection);
 
-            systemCell.appendChild(system);
+        const time=document.createElement("td");
 
-            const isp=
-                document.createElement("td");
+        time.className="time";
+        time.textContent=visit.datetime||"-";
 
-            isp.className="isp";
-            isp.textContent=
-                visit.isp||"Unknown";
+        row.append(
+            countryCell,
+            city,
+            systemCell,
+            isp,
+            connectionCell,
+            time
+        );
 
-            isp.title=
-                visit.isp||"Unknown";
-
-            const connectionCell=
-                document.createElement("td");
-
-            const connection=
-                document.createElement("span");
-
-            connection.className=
-                "connection";
-
-            connection.textContent=
-                visit.connection||"Unknown";
-
-            connectionCell.appendChild(
-                connection
-            );
-
-            const time=
-                document.createElement("td");
-
-            time.className="time";
-            time.textContent=
-                visit.datetime||"-";
-
-            row.append(
-                countryCell,
-                city,
-                systemCell,
-                isp,
-                connectionCell,
-                time
-            );
-
-            list.appendChild(row);
-        }
-    );
+        list.appendChild(row);
+    });
 }
 
 load();
 
-setInterval(
-    load,
-    10000
-);
+setInterval(load,5000);
 </script>
 
 </body>
