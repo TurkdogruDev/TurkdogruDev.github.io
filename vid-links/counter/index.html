@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#090909">
-<meta name="color-scheme" content="dark">
+
 <title>Visitors</title>
 
 <style>
@@ -12,12 +12,10 @@
     box-sizing:border-box;
 }
 
-html,
 body{
     margin:0;
-    min-height:100%;
     background:#090909;
-    color:#f4f4f5;
+    color:#eee;
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -27,15 +25,17 @@ body{
 }
 
 main{
-    width:min(1120px,calc(100% - 32px));
-    margin:48px auto;
+    width:min(
+        1100px,
+        calc(100% - 28px)
+    );
+    margin:45px auto;
 }
 
 header{
     display:flex;
     align-items:flex-end;
     justify-content:space-between;
-    gap:20px;
     margin-bottom:18px;
 }
 
@@ -43,7 +43,6 @@ h1{
     margin:0;
     font-size:21px;
     font-weight:600;
-    letter-spacing:-.4px;
 }
 
 .total{
@@ -55,9 +54,8 @@ h1{
 .total strong{
     display:block;
     margin-top:2px;
-    color:#fafafa;
+    color:#fff;
     font-size:25px;
-    font-weight:600;
 }
 
 .panel{
@@ -73,28 +71,23 @@ h1{
 
 table{
     width:100%;
-    min-width:920px;
+    min-width:900px;
     border-collapse:collapse;
 }
 
 th{
     padding:13px 15px;
-    color:#5f5f5f;
-    border-bottom:1px solid #1d1d1d;
     text-align:left;
+    color:#5d5d5d;
     font-size:10px;
-    font-weight:600;
-    letter-spacing:.55px;
+    letter-spacing:.5px;
+    border-bottom:1px solid #1d1d1d;
 }
 
 td{
     padding:14px 15px;
-    border-bottom:1px solid #171717;
     font-size:13px;
-}
-
-tbody tr:last-child td{
-    border-bottom:0;
+    border-bottom:1px solid #171717;
 }
 
 .country{
@@ -106,17 +99,15 @@ tbody tr:last-child td{
 .flag{
     width:27px;
     height:20px;
-    flex:none;
     object-fit:cover;
     border-radius:3px;
-    background:#151515;
 }
 
-.countryName{
+.name{
     font-weight:500;
 }
 
-.countryCode{
+.code{
     margin-top:2px;
     color:#555;
     font-size:10px;
@@ -128,35 +119,13 @@ tbody tr:last-child td{
     color:#999;
 }
 
-.isp{
-    max-width:220px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-}
-
-.badge{
-    display:inline-flex;
-    align-items:center;
-    min-height:26px;
-    padding:4px 8px;
+.tag{
+    display:inline-block;
+    padding:5px 8px;
     background:#151515;
     border:1px solid #242424;
     border-radius:6px;
-    white-space:nowrap;
     font-size:11px;
-}
-
-.vpn{
-    border-color:#403326;
-}
-
-.hosting{
-    border-color:#32323e;
-}
-
-.normal{
-    border-color:#24342a;
 }
 
 .time{
@@ -164,23 +133,15 @@ tbody tr:last-child td{
 }
 
 .empty{
-    padding:55px 20px;
-    color:#555;
+    padding:50px;
     text-align:center;
+    color:#555;
 }
 
 @media(max-width:650px){
     main{
-        width:calc(100% - 20px);
-        margin:26px auto;
-    }
-
-    h1{
-        font-size:19px;
-    }
-
-    .total strong{
-        font-size:22px;
+        width:calc(100% - 18px);
+        margin:25px auto;
     }
 }
 </style>
@@ -202,7 +163,6 @@ Total
 </header>
 
 <div class="panel">
-
 <div class="scroll">
 
 <table>
@@ -219,38 +179,36 @@ Total
 </thead>
 
 <tbody id="list">
+
 <tr>
-<td
-    colspan="6"
-    class="empty"
->
+<td colspan="6" class="empty">
 ...
 </td>
 </tr>
+
 </tbody>
 
 </table>
 
 </div>
-
 </div>
 
 </main>
 
 <script>
 const NAMESPACE=
-    "mete-counter-x8k92m412";
+    "mete-counter-x8k92m413";
 
 const DB=
     `https://mantledb.sh/v2/${NAMESPACE}`;
 
-function getDays(amount=30){
-    const days=[];
+function days(amount=30){
+    const result=[];
     const d=new Date();
 
     for(let i=0;i<amount;i++){
 
-        days.push(
+        result.push(
             [
                 d.getUTCFullYear(),
                 String(
@@ -267,51 +225,29 @@ function getDays(amount=30){
         );
     }
 
-    return days;
+    return result;
 }
 
-function getCountryName(code){
-    if(
-        !code ||
-        code==="XX"
-    ){
-        return "Unknown";
-    }
-
-    try{
-        return new Intl.DisplayNames(
-            ["tr"],
-            {
-                type:"region"
-            }
-        ).of(code);
-    }
-    catch{
-        return code;
-    }
-}
-
-function createFlag(code){
+function flagFor(visit){
     const img=
         document.createElement("img");
 
     img.className="flag";
 
-    if(
-        !code ||
-        code==="XX" ||
-        !/^[A-Z]{2}$/i.test(code)
+    if(visit.flag){
+        img.src=visit.flag;
+    }
+    else if(
+        /^[A-Z]{2}$/i.test(
+            visit.country||""
+        )
     ){
-        img.style.visibility=
-            "hidden";
-
-        return img;
+        img.src=
+            `https://flagcdn.com/40x30/${visit.country.toLowerCase()}.png`;
     }
 
-    img.src=
-        `https://flagcdn.com/40x30/${code.toLowerCase()}.png`;
-
-    img.alt=code;
+    img.alt=
+        visit.country||"";
 
     img.onerror=()=>{
         img.style.visibility=
@@ -321,45 +257,9 @@ function createFlag(code){
     return img;
 }
 
-function createBadge(
-    value,
-    extra=""
-){
-    const badge=
-        document.createElement("span");
-
-    badge.className=
-        `badge ${extra}`;
-
-    badge.textContent=
-        value||"Unknown";
-
-    return badge;
-}
-
-function connectionClass(value){
-    const v=
-        String(value||"")
-            .toLowerCase();
-
-    if(v==="vpn"){
-        return "vpn";
-    }
-
-    if(v==="hosting"){
-        return "hosting";
-    }
-
-    if(v==="normal"){
-        return "normal";
-    }
-
-    return "";
-}
-
 async function getTotal(){
     try{
-        const response=
+        const r=
             await fetch(
                 `${DB}/stats`,
                 {
@@ -367,12 +267,12 @@ async function getTotal(){
                 }
             );
 
-        if(!response.ok){
+        if(!r.ok){
             return null;
         }
 
         const data=
-            await response.json();
+            await r.json();
 
         return Number(
             data.total||0
@@ -386,11 +286,11 @@ async function getTotal(){
 async function getVisits(){
     const visits=[];
 
-    const requests=
-        getDays(30).map(
+    await Promise.all(
+        days().map(
             async day=>{
                 try{
-                    const response=
+                    const r=
                         await fetch(
                             `${DB}/visits/${day}`,
                             {
@@ -398,41 +298,26 @@ async function getVisits(){
                             }
                         );
 
-                    if(!response.ok){
+                    if(!r.ok){
                         return;
                     }
 
                     const data=
-                        await response.json();
-
-                    if(
-                        !data ||
-                        typeof data!=="object"
-                    ){
-                        return;
-                    }
+                        await r.json();
 
                     Object
                         .values(data)
                         .forEach(
-                            visit=>{
-                                if(
-                                    visit &&
-                                    typeof visit==="object"
-                                ){
-                                    visits.push(
-                                        visit
-                                    );
+                            v=>{
+                                if(v){
+                                    visits.push(v);
                                 }
                             }
                         );
                 }
                 catch{}
             }
-        );
-
-    await Promise.all(
-        requests
+        )
     );
 
     visits.sort(
@@ -444,21 +329,34 @@ async function getVisits(){
     return visits;
 }
 
+function tag(value){
+    const span=
+        document.createElement("span");
+
+    span.className="tag";
+
+    span.textContent=
+        value||"Unknown";
+
+    return span;
+}
+
 async function load(){
     const [
         visits,
-        savedTotal
-    ]=await Promise.all([
-        getVisits(),
-        getTotal()
-    ]);
+        total
+    ]=
+        await Promise.all([
+            getVisits(),
+            getTotal()
+        ]);
 
     document
         .getElementById("total")
         .textContent=
-            savedTotal===null
+            total===null
                 ?visits.length
-                :savedTotal;
+                :total;
 
     const list=
         document.getElementById(
@@ -507,19 +405,17 @@ async function load(){
                 const name=
                     document.createElement("div");
 
-                name.className=
-                    "countryName";
+                name.className="name";
 
                 name.textContent=
-                    getCountryName(
-                        visit.country
-                    );
+                    visit.countryName||
+                    visit.country||
+                    "Unknown";
 
                 const code=
                     document.createElement("div");
 
-                code.className=
-                    "countryCode";
+                code.className="code";
 
                 code.textContent=
                     visit.country||
@@ -531,16 +427,13 @@ async function load(){
                 );
 
                 country.append(
-                    createFlag(
-                        visit.country
-                    ),
+                    flagFor(visit),
                     text
                 );
 
-                countryCell
-                    .appendChild(
-                        country
-                    );
+                countryCell.appendChild(
+                    country
+                );
 
                 const city=
                     document.createElement("td");
@@ -551,14 +444,11 @@ async function load(){
                     visit.city||
                     "Unknown";
 
-                const systemCell=
+                const system=
                     document.createElement("td");
 
-                systemCell.appendChild(
-                    createBadge(
-                        visit.os||
-                        "Other"
-                    )
+                system.appendChild(
+                    tag(visit.os)
                 );
 
                 const isp=
@@ -570,20 +460,12 @@ async function load(){
                     visit.isp||
                     "Unknown";
 
-                isp.title=
-                    visit.isp||
-                    "Unknown";
-
-                const connectionCell=
+                const connection=
                     document.createElement("td");
 
-                connectionCell.appendChild(
-                    createBadge(
-                        visit.connection||
-                        "Unknown",
-                        connectionClass(
-                            visit.connection
-                        )
+                connection.appendChild(
+                    tag(
+                        visit.connection
                     )
                 );
 
@@ -599,15 +481,13 @@ async function load(){
                 row.append(
                     countryCell,
                     city,
-                    systemCell,
+                    system,
                     isp,
-                    connectionCell,
+                    connection,
                     time
                 );
 
-                list.appendChild(
-                    row
-                );
+                list.appendChild(row);
             }
         );
 }
